@@ -1,0 +1,8 @@
+id: basic-xss
+info:
+  name: Basic XSS Check
+  severity: high
+  description: Tests for reflected XSS
+requests:
+  - method: GET
+    path: "/?search=<script>alert(1)</script>"
