@@ -1,0 +1,18 @@
+id: csp-header-missing
+
+info:
+  name: Content Security Policy Missing
+  author: khushi-nirsang
+  severity: medium
+  description: CSP header is not set (XSS protection weak)
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "Content-Security-Policy"
+        condition: or   # We check absence in code

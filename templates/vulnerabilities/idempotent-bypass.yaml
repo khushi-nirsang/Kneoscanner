@@ -1,0 +1,19 @@
+id: idempotent-method-bypass
+
+info:
+  name: Idempotent Method Bypass
+  author: khushi-nirsang
+  severity: medium
+  description: GET request modifying data (state changing)
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/delete?id=1"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "deleted"
+          - "success"
+        condition: or

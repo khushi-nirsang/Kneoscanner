@@ -1,0 +1,18 @@
+id: git-directory-exposed
+
+info:
+  name: .git Directory Exposure
+  author: khushi-nirsang
+  severity: high
+  description: Git repository metadata is publicly accessible
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.git/HEAD"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "ref: refs/heads"
+        condition: and

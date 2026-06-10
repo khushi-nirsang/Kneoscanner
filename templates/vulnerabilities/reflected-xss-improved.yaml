@@ -1,18 +1,20 @@
-id: xss-probe
+id: reflected-xss
 
 info:
-  name: Reflected XSS Probe
+  name: Reflected XSS Detection
   author: khushi-nirsang
-  severity: medium
-  description: Basic check for potential XSS in query parameters
+  severity: high
+  description: Possible reflected cross-site scripting vulnerability
 
 requests:
   - method: GET
     path:
+      - "{{BaseURL}}/?q=<script>alert(1)</script>"
       - "{{BaseURL}}/?search=test%3Cscript%3Ealert(1)%3C/script%3E"
     matchers:
       - type: word
         part: body
         words:
           - "<script>alert(1)</script>"
-        condition: and
+          - "alert(1)"
+        condition: or

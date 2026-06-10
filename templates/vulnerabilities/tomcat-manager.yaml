@@ -1,0 +1,19 @@
+id: tomcat-manager-exposed
+
+info:
+  name: Apache Tomcat Manager Exposed
+  author: khushi-nirsang
+  severity: high
+  description: Tomcat Manager interface is accessible
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manager/html"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "Tomcat Manager"
+          - "Server Information"
+        condition: or

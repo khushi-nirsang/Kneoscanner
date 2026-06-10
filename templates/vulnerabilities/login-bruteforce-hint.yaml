@@ -1,0 +1,20 @@
+id: login-page-detected
+
+info:
+  name: Login Page Detected (Brute Force Possible)
+  author: khushi-nirsang
+  severity: info
+  description: Login form found - potential target for brute force
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/login"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "password"
+          - "username"
+          - "type=\"password\""
+        condition: and

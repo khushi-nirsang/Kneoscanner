@@ -1,0 +1,18 @@
+id: crlf-injection
+
+info:
+  name: CRLF Injection
+  author: khushi-nirsang
+  severity: medium
+  description: HTTP Response Splitting via CRLF
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/%0d%0aSet-Cookie:test=123"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "test=123"
+        condition: and

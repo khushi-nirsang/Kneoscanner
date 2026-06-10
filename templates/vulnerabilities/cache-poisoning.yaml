@@ -1,0 +1,20 @@
+id: web-cache-poisoning
+
+info:
+  name: Web Cache Poisoning
+  author: khushi-nirsang
+  severity: high
+  description: Possible Web Cache Poisoning vector
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    headers:
+      - "X-Forwarded-Host: evil.com"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "evil.com"
+        condition: and

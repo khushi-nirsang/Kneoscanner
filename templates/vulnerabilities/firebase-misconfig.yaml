@@ -1,0 +1,20 @@
+id: firebase-database-exposed
+
+info:
+  name: Firebase Database Misconfiguration
+  author: khushi-nirsang
+  severity: high
+  description: Firebase database exposed without authentication
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.firebase.json"
+      - "{{BaseURL}}/.firebaserc"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "firebase"
+          - "apiKey"
+        condition: or

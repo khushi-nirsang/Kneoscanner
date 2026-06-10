@@ -1,0 +1,21 @@
+id: sql-injection-probe
+
+info:
+  name: SQL Injection Probe
+  author: khushi-nirsang
+  severity: high
+  description: Basic SQL injection probe
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/?id=1'"
+      - "{{BaseURL}}/?id=1\" OR \"1\"=\"1"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "SQL syntax"
+          - "mysql_fetch"
+          - "You have an error in your SQL syntax"
+        condition: or

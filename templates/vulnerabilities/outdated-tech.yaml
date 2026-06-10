@@ -1,0 +1,21 @@
+id: outdated-components
+
+info:
+  name: Outdated Technology Detected
+  author: khushi-nirsang
+  severity: medium
+  description: Server running outdated software
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "Apache/2.2"
+          - "PHP/5."
+          - "nginx/1.1"
+          - "IIS/6"
+        condition: or

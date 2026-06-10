@@ -1,0 +1,22 @@
+id: sql-injection
+
+info:
+  name: SQL Injection Vulnerability
+  author: khushi-nirsang
+  severity: critical
+  description: Possible SQL Injection
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/?id=1'"
+      - "{{BaseURL}}/?q=1%27+OR+%271%27=%271"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "SQL syntax"
+          - "mysql_fetch"
+          - "You have an error in your SQL syntax"
+          - "ORA-"
+        condition: or

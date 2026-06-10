@@ -1,0 +1,19 @@
+id: directory-listing-enabled
+
+info:
+  name: Directory Listing Enabled
+  author: khushi-nirsang
+  severity: medium
+  description: Web server is allowing directory listing
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "Index of /"
+          - "Parent Directory"
+        condition: or

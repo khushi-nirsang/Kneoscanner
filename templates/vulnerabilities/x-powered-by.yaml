@@ -1,0 +1,18 @@
+id: x-powered-by-exposure
+
+info:
+  name: X-Powered-By Header Exposure
+  author: khushi-nirsang
+  severity: low
+  description: Technology stack information is exposed via X-Powered-By header
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "X-Powered-By"
+        condition: and

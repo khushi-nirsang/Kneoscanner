@@ -1,0 +1,19 @@
+id: aws-s3-bucket-exposure
+
+info:
+  name: AWS S3 Bucket Exposure
+  author: khushi-nirsang
+  severity: high
+  description: Possible public S3 bucket detected
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - ".s3.amazonaws.com"
+          - "s3."
+        condition: or

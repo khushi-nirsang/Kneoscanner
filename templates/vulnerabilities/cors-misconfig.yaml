@@ -1,0 +1,18 @@
+id: cors-misconfig
+
+info:
+  name: CORS Misconfiguration
+  author: khushi-nirsang
+  severity: medium
+  description: CORS policy allows unauthorized origins
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "Access-Control-Allow-Origin: *"
+        condition: and

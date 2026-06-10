@@ -1,0 +1,19 @@
+id: jenkins-dashboard
+
+info:
+  name: Jenkins Dashboard Exposed
+  author: khushi-nirsang
+  severity: high
+  description: Jenkins CI/CD dashboard is publicly accessible
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/jenkins"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "Jenkins"
+          - "Dashboard"
+        condition: or

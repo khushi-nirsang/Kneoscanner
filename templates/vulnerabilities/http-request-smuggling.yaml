@@ -1,0 +1,15 @@
+id: http-request-smuggling
+
+info:
+  name: HTTP Request Smuggling Probe
+  author: khushi-nirsang
+  severity: high
+  description: Possible HTTP Request Smuggling
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}"
+    headers:
+      - "Content-Length: 0"
+      - "Transfer-Encoding: chunked"

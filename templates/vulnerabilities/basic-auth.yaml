@@ -1,0 +1,18 @@
+id: basic-auth-enabled
+
+info:
+  name: Basic Authentication Detected
+  author: khushi-nirsang
+  severity: info
+  description: Basic Auth protection found
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "WWW-Authenticate: Basic"
+        condition: and

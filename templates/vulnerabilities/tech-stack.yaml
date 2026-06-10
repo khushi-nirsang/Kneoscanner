@@ -1,0 +1,21 @@
+id: technology-detection
+
+info:
+  name: Technology Stack Detection
+  author: khushi-nirsang
+  severity: info
+  description: Detect common technologies
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "PHP"
+          - "nginx"
+          - "Express"
+          - "Django"
+        condition: or

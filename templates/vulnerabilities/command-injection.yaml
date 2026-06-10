@@ -1,0 +1,21 @@
+id: command-injection
+
+info:
+  name: Command Injection Probe
+  author: khushi-nirsang
+  severity: critical
+  description: Possible OS Command Injection
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/?cmd=;ls"
+      - "{{BaseURL}}/?ping=127.0.0.1|whoami"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "root:"
+          - "bin/bash"
+          - "uid="
+        condition: or

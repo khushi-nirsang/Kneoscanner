@@ -1,0 +1,21 @@
+id: swagger-ui-exposed
+
+info:
+  name: Swagger UI Exposed
+  author: khushi-nirsang
+  severity: medium
+  description: API documentation (Swagger) is publicly available
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/swagger-ui.html"
+      - "{{BaseURL}}/swagger"
+      - "{{BaseURL}}/api-docs"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "Swagger"
+          - "swagger-ui"
+        condition: or

@@ -1,0 +1,20 @@
+id: robots-txt-sensitive
+
+info:
+  name: Sensitive Paths in robots.txt
+  author: khushi-nirsang
+  severity: info
+  description: robots.txt reveals admin or sensitive directories
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/robots.txt"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "/admin"
+          - "/login"
+          - "/wp-admin"
+        condition: or

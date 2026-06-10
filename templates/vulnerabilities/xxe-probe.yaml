@@ -1,0 +1,13 @@
+id: xxe-vulnerable
+
+info:
+  name: XML External Entity (XXE)
+  author: khushi-nirsang
+  severity: high
+  description: Possible XXE vulnerability
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/upload"
+    # Note: Full POST body support coming later

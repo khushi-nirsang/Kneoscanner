@@ -1,0 +1,22 @@
+id: backup-file-exposure
+
+info:
+  name: Backup File Exposure
+  author: khushi-nirsang
+  severity: high
+  description: Backup or old files are accessible
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/backup.sql"
+      - "{{BaseURL}}/old.zip"
+      - "{{BaseURL}}/config.bak"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "CREATE TABLE"
+          - "INSERT INTO"
+          - "password"
+        condition: or

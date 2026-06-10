@@ -1,0 +1,20 @@
+id: php-error-disclosure
+
+info:
+  name: PHP Error Disclosure
+  author: khushi-nirsang
+  severity: medium
+  description: PHP errors or warnings are exposed
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/?invalid=1"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "PHP Warning"
+          - "Fatal error"
+          - "Parse error"
+        condition: or

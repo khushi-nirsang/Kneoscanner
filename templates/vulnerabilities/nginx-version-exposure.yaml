@@ -1,0 +1,18 @@
+id: nginx-version-exposure
+
+info:
+  name: Nginx Version Exposure
+  author: khushi-nirsang
+  severity: low
+  description: Nginx version disclosed in headers
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "nginx/"
+        condition: and

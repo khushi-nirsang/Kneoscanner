@@ -1,0 +1,13 @@
+id: unrestricted-file-upload
+
+info:
+  name: Unrestricted File Upload
+  author: khushi-nirsang
+  severity: critical
+  description: Possible unrestricted file upload vulnerability
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/upload"
+    # Full file upload support will be added later

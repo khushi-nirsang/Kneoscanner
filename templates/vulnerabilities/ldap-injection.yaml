@@ -1,0 +1,19 @@
+id: ldap-injection
+
+info:
+  name: LDAP Injection Probe
+  author: khushi-nirsang
+  severity: high
+  description: Possible LDAP Injection
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/?user=*)(uid=*))(|(uid=*"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "LDAP"
+          - "Invalid DN"
+        condition: or

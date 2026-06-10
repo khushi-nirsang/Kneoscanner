@@ -1,0 +1,19 @@
+id: open-redirect
+
+info:
+  name: Open Redirect Vulnerability
+  author: khushi-nirsang
+  severity: medium
+  description: Possible open redirect found
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/redirect?url=https://evil.com"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "evil.com"
+          - "location=https"
+        condition: or

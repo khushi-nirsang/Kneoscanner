@@ -1,0 +1,19 @@
+id: cloudfront-misconfig
+
+info:
+  name: CloudFront Misconfiguration
+  author: khushi-nirsang
+  severity: medium
+  description: AWS CloudFront origin may be exposed
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "cloudfront"
+          - "x-amz-cf-id"
+        condition: or

@@ -1,0 +1,22 @@
+id: sensitive-file-exposure
+
+info:
+  name: Sensitive File Exposure
+  author: khushi-nirsang
+  severity: high
+  description: Common sensitive files exposed
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.env"
+      - "{{BaseURL}}/config.php"
+      - "{{BaseURL}}/backup.zip"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "DB_PASSWORD"
+          - "<?php"
+          - "password="
+        condition: or

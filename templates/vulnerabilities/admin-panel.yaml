@@ -1,0 +1,23 @@
+id: admin-panel-detection
+
+info:
+  name: Admin Panel Exposure
+  author: khushi-nirsang
+  severity: info
+  description: Common admin panels detected
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/admin"
+      - "{{BaseURL}}/administrator"
+      - "{{BaseURL}}/wp-admin"
+      - "{{BaseURL}}/login"
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "admin"
+          - "login"
+          - "password"
+        condition: or

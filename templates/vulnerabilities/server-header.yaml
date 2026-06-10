@@ -1,0 +1,21 @@
+id: server-header-exposure
+
+info:
+  name: Server Header Exposure
+  author: khushi-nirsang
+  severity: low
+  description: Web server is leaking its software version via Server header
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "apache"
+          - "nginx"
+          - "iis"
+          - "php"
+        condition: or

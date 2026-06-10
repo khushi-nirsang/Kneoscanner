@@ -1,0 +1,19 @@
+id: missing-security-headers
+
+info:
+  name: Missing Security Headers
+  author: khushi-nirsang
+  severity: medium
+  description: Several important security headers are missing
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "X-Frame-Options"
+          - "Strict-Transport-Security"
+        condition: or
