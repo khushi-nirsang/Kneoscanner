@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sync"
 	"text/template"
 	"time"
 )
@@ -21,6 +22,7 @@ type Results struct {
 	Target string       `json:"target"`
 	Total  int          `json:"total"`
 	Items  []ScanResult `json:"items"`
+	mu     sync.Mutex
 }
 
 func NewResults() *Results {
@@ -30,6 +32,8 @@ func NewResults() *Results {
 }
 
 func (r *Results) Add(result ScanResult) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	result.Timestamp = time.Now()
 	r.Items = append(r.Items, result)
 }
@@ -41,17 +45,20 @@ func (r *Results) Print() {
 }
 
 func (r *Results) SaveJSON(outputFile string) error {
+	r.mu.Lock()
 	r.Total = len(r.Items)
 	data, err := json.MarshalIndent(r, "", "  ")
+	r.mu.Unlock()
 	if err != nil {
 		return err
 	}
 	return os.WriteFile(outputFile, data, 0644)
 }
 
-// SaveHTML generates a nice HTML report
 func (r *Results) SaveHTML(outputFile string) error {
+	r.mu.Lock()
 	r.Total = len(r.Items)
+	r.mu.Unlock()
 
 	htmlTemplate := `<!DOCTYPE html>
 <html>
@@ -66,24 +73,25 @@ func (r *Results) SaveHTML(outputFile string) error {
         .low { background: #fef3c7; }
         .medium { background: #fed7aa; }
         .high { background: #fecaca; }
+        .critical { background: #fca5a5; }
     </style>
 </head>
 <body>
     <h1>NeoScanner Report</h1>
-    <p><strong>Target:</strong> {{.Target}} | <strong>Findings:</strong> {{.Total}}</p>
+    <p><strong>Total Findings:</strong> {{.Total}}</p>
     <table>
         <tr>
+            <th>Target</th>
             <th>Severity</th>
             <th>Vulnerability</th>
             <th>Description</th>
-            <th>Time</th>
         </tr>
         {{range .Items}}
         <tr class="{{.Severity}}">
+            <td>{{.Target}}</td>
             <td>{{.Severity}}</td>
             <td>{{.Name}}</td>
             <td>{{.Description}}</td>
-            <td>{{.Timestamp.Format "2006-01-02 15:04:05"}}</td>
         </tr>
         {{end}}
     </table>
