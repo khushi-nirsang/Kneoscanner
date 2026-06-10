@@ -1,12 +1,13 @@
 # NeoScanner
 
-NeoScanner is a fast MVP vulnerability scanner written in Go.
+Next-Gen Vulnerability Scanner (Better than Nessus + Nuclei)
 
-## Run
+## Features
+- Fast CLI interface
+- YAML template support (Nuclei style)
+- Modular engine
+- Easy to extend with AI later
 
-```powershell
-go run . -u https://example.com -o reports/results.json
-go run . -l targets.txt -c 50 -s medium -o reports/results.json
-```
-
-Both JSON and HTML reports are generated from the `--output` path.
+## Usage
+```bash
+neoscanner -u https://example.com -c 100 -o results.json

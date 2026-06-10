@@ -4,7 +4,11 @@ info:
   name: Server Header Exposure
   author: khushi-nirsang
   severity: low
+<<<<<<< HEAD
   description: Web server is leaking its software version via Server header
+=======
+  description: Web server is leaking version information via Server header
+>>>>>>> origin/main
 
 requests:
   - method: GET
@@ -14,8 +18,13 @@ requests:
       - type: word
         part: header
         words:
+<<<<<<< HEAD
           - "apache"
           - "nginx"
           - "iis"
           - "php"
         condition: or
+=======
+          - "Server:"
+        condition: and
+>>>>>>> origin/main

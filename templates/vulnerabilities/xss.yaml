@@ -15,4 +15,8 @@ requests:
         part: body
         words:
           - "<script>alert(1)</script>"
+<<<<<<< HEAD
         condition: and
+=======
+        condition: and
+>>>>>>> origin/main

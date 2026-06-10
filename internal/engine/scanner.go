@@ -131,17 +131,4 @@ func (s *Scanner) matchResponse(resp *utils.Response, matcher templates.Matcher)
 func (s *Scanner) SaveResults(outputFile, severityFilter string) {
 	fmt.Printf("📊 Saving results to %s\n", outputFile)
 	s.Results.Print()
-
-	if err := s.Results.SaveJSON(outputFile); err != nil {
-		fmt.Printf("❌ Failed to save JSON: %v\n", err)
-	} else {
-		fmt.Printf("✅ JSON report saved!\n")
-	}
-
-	htmlFile := "reports/results.html"
-	if err := s.Results.SaveHTML(htmlFile); err != nil {
-		fmt.Printf("❌ Failed to save HTML: %v\n", err)
-	} else {
-		fmt.Printf("✅ HTML report saved: %s\n", htmlFile)
-	}
 }

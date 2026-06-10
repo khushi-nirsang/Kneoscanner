@@ -1,8 +1,6 @@
 package main
 
-import (
-	"github.com/khushi-nirsang/neoscanner/cmd"
-)
+import "github.com/yourusername/neoscanner/cmd"
 
 func main() {
 	cmd.Execute()
