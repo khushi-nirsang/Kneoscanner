@@ -47,7 +47,7 @@ var rootCmd = &cobra.Command{
 
 		targets := getTargets(target, targetList)
 		if len(targets) == 0 {
-			color.Red("Error: Please provide target using -u <url> or -l <targets.txt>")
+			color.Red("Error: Use -u <url> or -l <targets.txt>")
 			os.Exit(1)
 		}
 
@@ -76,7 +76,7 @@ var rootCmd = &cobra.Command{
 
 		wg.Wait()
 
-		scanner.SaveResults("reports/results.json", severity)
+		scanner.SaveResults("reports/results.json")
 		color.Green("\n✅ Scan completed. Total Findings: %d", len(scanner.Results.Items))
 	},
 }
@@ -90,14 +90,17 @@ func getTargets(single, listFile string) []string {
 
 	if listFile != "" {
 		file, err := os.Open(listFile)
-		if err == nil {
-			defer file.Close()
-			scanner := bufio.NewScanner(file)
-			for scanner.Scan() {
-				line := strings.TrimSpace(scanner.Text())
-				if line != "" && !strings.HasPrefix(line, "#") {
-					targets = append(targets, line)
-				}
+		if err != nil {
+			fmt.Printf("⚠️ Could not open target list: %s\n", listFile)
+			return targets
+		}
+		defer file.Close()
+
+		fileScanner := bufio.NewScanner(file)
+		for fileScanner.Scan() {
+			line := strings.TrimSpace(fileScanner.Text())
+			if line != "" && !strings.HasPrefix(line, "#") {
+				targets = append(targets, line)
 			}
 		}
 	}
@@ -107,12 +110,10 @@ func getTargets(single, listFile string) []string {
 
 func init() {
 	rootCmd.Flags().StringVarP(&target, "target", "u", "", "Single target URL")
-	rootCmd.Flags().StringVarP(&targetList, "list", "l", "", "Target list file (one per line)")
+	rootCmd.Flags().StringVarP(&targetList, "list", "l", "", "Target list file")
 	rootCmd.Flags().IntVarP(&threads, "threads", "c", 50, "Number of concurrent threads")
 	rootCmd.Flags().StringVarP(&templateDir, "templates", "t", "templates", "Templates directory")
-	rootCmd.Flags().StringVarP(&severity, "severity", "s", "", "Filter severity (info,low,medium,high,critical)")
-
-	// Removed MarkFlagRequired so both -u and -l work
+	rootCmd.Flags().StringVarP(&severity, "severity", "s", "", "Severity filter (info,low,medium,high,critical)")
 }
 
 func Execute() {

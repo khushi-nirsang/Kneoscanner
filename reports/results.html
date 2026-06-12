@@ -1,149 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>NeoScanner Report</title>
-    <style>
-        body { font-family: Arial; margin: 20px; background: #f4f4f4; }
-        h1 { color: #1e3a8a; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background: #1e3a8a; color: white; }
-        .low { background: #fef3c7; }
-        .medium { background: #fed7aa; }
-        .high { background: #fecaca; }
-        .critical { background: #fca5a5; }
-    </style>
+<head><title>NeoScanner Report</title>
+<style>
+body{font-family:Arial;margin:20px;background:#f4f4f4}
+h1{color:#1e3a8a}
+table{width:100%;border-collapse:collapse;background:white}
+th,td{padding:12px;border:1px solid #ddd;text-align:left}
+th{background:#1e3a8a;color:white}
+.low{background:#fef3c7}
+.medium{background:#fed7aa}
+.high{background:#fecaca}
+.critical{background:#fca5a5}
+</style>
 </head>
 <body>
-    <h1>NeoScanner Report</h1>
-    <p><strong>Total Findings:</strong> 17</p>
-    <table>
-        <tr>
-            <th>Target</th>
-            <th>Severity</th>
-            <th>Vulnerability</th>
-            <th>Description</th>
-        </tr>
-        
-        <tr class="high">
-            <td>https://uou.ac.in/</td>
-            <td>high</td>
-            <td>Broken Access Control Detected</td>
-            <td>Possible IDOR or unauthorized access</td>
-        </tr>
-        
-        <tr class="critical">
-            <td>https://uou.ac.in/</td>
-            <td>critical</td>
-            <td>Command Injection Probe</td>
-            <td>Possible OS Command Injection</td>
-        </tr>
-        
-        <tr class="medium">
-            <td>https://uou.ac.in/</td>
-            <td>medium</td>
-            <td>Debug Page Exposed</td>
-            <td>Application debug information exposed</td>
-        </tr>
-        
-        <tr class="high">
-            <td>https://uou.ac.in/</td>
-            <td>high</td>
-            <td>Docker API Exposed</td>
-            <td>Docker daemon API is accessible</td>
-        </tr>
-        
-        <tr class="high">
-            <td>https://uou.ac.in/</td>
-            <td>high</td>
-            <td>Jenkins Dashboard Exposed</td>
-            <td>Jenkins CI/CD dashboard is publicly accessible</td>
-        </tr>
-        
-        <tr class="medium">
-            <td>https://ssc.edu.in/</td>
-            <td>medium</td>
-            <td>Debug Page Exposed</td>
-            <td>Application debug information exposed</td>
-        </tr>
-        
-        <tr class="info">
-            <td>https://uou.ac.in/</td>
-            <td>info</td>
-            <td>Sensitive Paths in robots.txt</td>
-            <td>robots.txt reveals admin or sensitive directories</td>
-        </tr>
-        
-        <tr class="low">
-            <td>https://ssc.edu.in/</td>
-            <td>low</td>
-            <td>Nginx Version Exposure</td>
-            <td>Nginx version disclosed in headers</td>
-        </tr>
-        
-        <tr class="info">
-            <td>https://ssc.edu.in/</td>
-            <td>info</td>
-            <td>Sensitive Paths in robots.txt</td>
-            <td>robots.txt reveals admin or sensitive directories</td>
-        </tr>
-        
-        <tr class="low">
-            <td>https://ssc.edu.in/</td>
-            <td>low</td>
-            <td>Server Header Exposure</td>
-            <td>Web server is leaking its software version via Server header</td>
-        </tr>
-        
-        <tr class="info">
-            <td>https://ssc.edu.in/</td>
-            <td>info</td>
-            <td>Technology Stack Detection</td>
-            <td>Detect common technologies</td>
-        </tr>
-        
-        <tr class="high">
-            <td>https://brcrn.gov.np/</td>
-            <td>high</td>
-            <td>Docker API Exposed</td>
-            <td>Docker daemon API is accessible</td>
-        </tr>
-        
-        <tr class="low">
-            <td>https://brcrn.gov.np/</td>
-            <td>low</td>
-            <td>Nginx Version Exposure</td>
-            <td>Nginx version disclosed in headers</td>
-        </tr>
-        
-        <tr class="low">
-            <td>https://brcrn.gov.np/</td>
-            <td>low</td>
-            <td>Server Header Exposure</td>
-            <td>Web server is leaking its software version via Server header</td>
-        </tr>
-        
-        <tr class="info">
-            <td>https://brcrn.gov.np/</td>
-            <td>info</td>
-            <td>Technology Stack Detection</td>
-            <td>Detect common technologies</td>
-        </tr>
-        
-        <tr class="info">
-            <td>https://vigneronsamboise.com/</td>
-            <td>info</td>
-            <td>Sensitive Paths in robots.txt</td>
-            <td>robots.txt reveals admin or sensitive directories</td>
-        </tr>
-        
-        <tr class="low">
-            <td>https://vigneronsamboise.com/</td>
-            <td>low</td>
-            <td>Server Header Exposure</td>
-            <td>Web server is leaking its software version via Server header</td>
-        </tr>
-        
-    </table>
-</body>
-</html>
+<h1>NeoScanner Report</h1>
+<p>Total Findings: 35</p>
+<table>
+<tr><th>Target</th><th>Severity</th><th>Vulnerability</th><th>Description</th></tr>

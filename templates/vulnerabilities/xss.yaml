@@ -4,7 +4,7 @@ info:
   name: Reflected XSS Probe
   author: khushi-nirsang
   severity: medium
-  description: Basic check for potential XSS in query parameters
+  description: Basic reflected XSS probe
 
 requests:
   - method: GET
@@ -15,8 +15,4 @@ requests:
         part: body
         words:
           - "<script>alert(1)</script>"
-<<<<<<< HEAD
         condition: and
-=======
-        condition: and
->>>>>>> origin/main

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -38,13 +39,11 @@ func (s *Scanner) LoadTemplates(templateDir string) {
 		}
 		name := info.Name()
 		if strings.HasSuffix(name, ".yaml") || strings.HasSuffix(name, ".yml") {
-			fmt.Printf("📄 Trying to load: %s\n", path)
 			tmpl, err := templates.LoadTemplate(path)
 			if err == nil {
 				s.templates = append(s.templates, tmpl)
 				count++
-			} else {
-				fmt.Printf("❌ Failed to load %s: %v\n", name, err)
+				fmt.Printf("📋 Loaded: %s [%s]\n", tmpl.Info.Name, tmpl.Info.Severity)
 			}
 		}
 		return nil
@@ -54,12 +53,11 @@ func (s *Scanner) LoadTemplates(templateDir string) {
 }
 
 func (s *Scanner) StartScan(target string) {
-	fmt.Printf("🔍 Scanning target: %s\n", target)
-	os.MkdirAll("reports", 0755)
+	fmt.Printf("🔍 Scanning: %s\n", target)
 
 	resp, err := s.httpClient.Get(target)
 	if err != nil {
-		fmt.Printf("❌ Failed to connect: %v\n", err)
+		fmt.Printf("❌ Failed: %v\n", err)
 		return
 	}
 
@@ -72,10 +70,6 @@ func (s *Scanner) executeTemplate(tmpl *templates.Template, target string, resp 
 	for _, req := range tmpl.Requests {
 		for _, matcher := range req.Matchers {
 			if s.matchResponse(resp, matcher) {
-				if isNoisyTemplate(tmpl.Info.Name) {
-					return
-				}
-
 				s.mu.Lock()
 				s.Results.Add(ScanResult{
 					Target:      target,
@@ -93,21 +87,9 @@ func (s *Scanner) executeTemplate(tmpl *templates.Template, target string, resp 
 	}
 }
 
-func isNoisyTemplate(name string) bool {
-	noisy := []string{
-		"GraphQL", "Health Check", "Admin Panel", "XML Injection", 
-		"Login Page Detected", "Idempotent Method Bypass",
-	}
-	for _, n := range noisy {
-		if strings.Contains(name, n) {
-			return true
-		}
-	}
-	return false
-}
-
 func (s *Scanner) matchResponse(resp *utils.Response, matcher templates.Matcher) bool {
-	if matcher.Type == "word" {
+	switch matcher.Type {
+	case "word":
 		text := ""
 		if matcher.Part == "header" {
 			text = resp.Header.Get("Server")
@@ -120,15 +102,36 @@ func (s *Scanner) matchResponse(resp *utils.Response, matcher templates.Matcher)
 
 		for _, word := range matcher.Words {
 			if strings.Contains(strings.ToLower(text), strings.ToLower(word)) {
-				return true
+				return !matcher.Negative // support negative match later
+			}
+		}
+	case "status":
+		// TODO: implement status code matching
+		return false
+	case "regex":
+		if matcher.Regex != "" {
+			re := regexp.MustCompile(matcher.Regex)
+			if matcher.Part == "body" {
+				return re.MatchString(resp.BodyContent)
 			}
 		}
 	}
 	return false
 }
 
-// Updated to accept severity filter
-func (s *Scanner) SaveResults(outputFile, severityFilter string) {
+func (s *Scanner) SaveResults(outputFile string) {
 	fmt.Printf("📊 Saving results to %s\n", outputFile)
 	s.Results.Print()
+
+	if err := s.Results.SaveJSON(outputFile); err != nil {
+		fmt.Printf("❌ JSON save failed\n")
+	} else {
+		fmt.Printf("✅ JSON saved\n")
+	}
+
+	if err := s.Results.SaveHTML("reports/results.html"); err != nil {
+		fmt.Printf("❌ HTML save failed\n")
+	} else {
+		fmt.Printf("✅ HTML saved\n")
+	}
 }
