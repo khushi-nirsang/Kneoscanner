@@ -1,7 +1,0 @@
-id: insecure-deserialization
-
-info:
-  name: Insecure Deserialization
-  author: khushi-nirsang
-  severity: high
-  description: Possible deserialization vulnerability

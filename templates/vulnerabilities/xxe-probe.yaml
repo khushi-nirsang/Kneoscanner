@@ -4,10 +4,23 @@ info:
   name: XML External Entity (XXE)
   author: khushi-nirsang
   severity: high
-  description: Possible XXE vulnerability
+  description: |
+    Placeholder XXE template.
+    Full XXE detection requires XML payload support
+    which is not yet implemented in the scanner engine.
 
 requests:
   - method: POST
+
     path:
       - "{{BaseURL}}/upload"
-    # Note: Full POST body support coming later
+
+    headers:
+      Content-Type: application/xml
+
+    body: "<test>xxe</test>"
+
+    matchers:
+      - type: status
+        status:
+          - 200

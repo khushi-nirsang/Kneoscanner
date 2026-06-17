@@ -1,137 +1,438 @@
 package engine
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
-	"regexp"
-	"strings"
-	"sync"
+"fmt"
+"net/url"
+"os"
+"path/filepath"
+"regexp"
+"strings"
+"sync"
 
-	"github.com/khushi-nirsang/neoscanner/internal/templates"
-	"github.com/khushi-nirsang/neoscanner/internal/utils"
+
+"github.com/fatih/color"
+"github.com/khushi-nirsang/neoscanner/internal/templates"
+"github.com/khushi-nirsang/neoscanner/internal/utils"
+
+
 )
 
 type Scanner struct {
-	Threads    int
-	Results    *Results
-	httpClient *utils.HTTPClient
-	templates  []*templates.Template
-	mu         sync.Mutex
+Threads    int
+Results    *Results
+httpClient *utils.HTTPClient
+
+templates []*templates.Template
+mu        sync.RWMutex
+
 }
 
 func NewScanner(threads int, timeout int) *Scanner {
-	return &Scanner{
-		Threads:    threads,
-		Results:    NewResults(),
-		httpClient: utils.NewHTTPClient(timeout),
-		templates:  make([]*templates.Template, 0),
-	}
+
+if threads <= 0 {
+	threads = 25
 }
 
-func (s *Scanner) LoadTemplates(templateDir string) {
-	os.MkdirAll(templateDir, 0755)
-	count := 0
+return &Scanner{
+	Threads:    threads,
+	Results:    NewResults(),
+	httpClient: utils.NewHTTPClient(timeout),
+	templates:  make([]*templates.Template, 0),
+}
 
-	_ = filepath.Walk(templateDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil || info.IsDir() {
+}
+
+func (s *Scanner) LoadTemplates(templateDir string) error {
+
+if templateDir == "" {
+	templateDir = "templates"
+}
+
+if _, err := os.Stat(templateDir); err != nil {
+	return fmt.Errorf("template directory not found: %s", templateDir)
+}
+
+count := 0
+
+err := filepath.Walk(
+	templateDir,
+	func(path string, info os.FileInfo, err error) error {
+
+		if err != nil {
 			return nil
 		}
-		name := info.Name()
-		if strings.HasSuffix(name, ".yaml") || strings.HasSuffix(name, ".yml") {
-			tmpl, err := templates.LoadTemplate(path)
-			if err == nil {
-				s.templates = append(s.templates, tmpl)
-				count++
-				fmt.Printf("📋 Loaded: %s [%s]\n", tmpl.Info.Name, tmpl.Info.Severity)
-			}
-		}
-		return nil
-	})
 
-	fmt.Printf("🔧 Loaded %d templates\n", count)
+		if info == nil || info.IsDir() {
+			return nil
+		}
+
+		if !strings.HasSuffix(info.Name(), ".yaml") &&
+			!strings.HasSuffix(info.Name(), ".yml") {
+			return nil
+		}
+
+		tmpl, err := templates.LoadTemplate(path)
+		if err != nil {
+
+			color.Yellow(
+				"Skipped template %s : %v",
+				info.Name(),
+				err,
+			)
+
+			return nil
+		}
+
+		if err := templates.ValidateTemplate(*tmpl); err != nil {
+
+			color.Yellow(
+				"Invalid template %s : %v",
+				info.Name(),
+				err,
+			)
+
+			return nil
+		}
+
+		s.templates = append(s.templates, tmpl)
+
+		count++
+
+		color.Green(
+			"Loaded: %s [%s]",
+			tmpl.Info.Name,
+			tmpl.Info.Severity,
+		)
+
+		return nil
+	},
+)
+
+if err != nil {
+	return err
+}
+
+if count == 0 {
+	return fmt.Errorf("no valid templates loaded")
+}
+
+color.Cyan("Templates Loaded: %d", count)
+
+return nil
+
 }
 
 func (s *Scanner) StartScan(target string) {
-	fmt.Printf("🔍 Scanning: %s\n", target)
 
-	resp, err := s.httpClient.Get(target)
-	if err != nil {
-		fmt.Printf("❌ Failed: %v\n", err)
+target = normalizeTarget(target)
+
+color.Cyan("Scanning: %s", target)
+
+for _, tmpl := range s.templates {
+	s.executeTemplate(tmpl, target)
+}
+
+}
+
+func (s *Scanner) executeTemplate(
+tmpl *templates.Template,
+target string,
+) {
+
+for _, req := range tmpl.Requests {
+
+	method := strings.ToUpper(strings.TrimSpace(req.Method))
+
+	if method == "" {
+		method = "GET"
+	}
+
+	for _, rawPath := range req.Path {
+
+		requestURL := buildRequestURL(target, rawPath)
+
+		resp, err := s.httpClient.Do(
+			method,
+			requestURL,
+			req.Headers,
+			renderTemplateValue(req.Body, target),
+		)
+
+		if err != nil {
+			continue
+		}
+
+		if !s.matchMatchers(
+			resp,
+			req.Matchers,
+			req.MatchersCondition,
+		) {
+			continue
+		}
+
+		s.Results.Add(
+			ScanResult{
+				Target:      target,
+				TemplateID:  tmpl.ID,
+				Name:        tmpl.Info.Name,
+				Severity:    tmpl.Info.Severity,
+				Matched:     true,
+				Description: tmpl.Info.Description,
+				MatchedURL:  requestURL,
+				Method:      method,
+				StatusCode:  resp.StatusCode,
+			},
+		)
+
+		color.Red(
+			"[%s] %s -> %s",
+			strings.ToUpper(tmpl.Info.Severity),
+			tmpl.Info.Name,
+			requestURL,
+		)
+
 		return
 	}
-
-	for _, tmpl := range s.templates {
-		s.executeTemplate(tmpl, target, resp)
-	}
 }
 
-func (s *Scanner) executeTemplate(tmpl *templates.Template, target string, resp *utils.Response) {
-	for _, req := range tmpl.Requests {
-		for _, matcher := range req.Matchers {
-			if s.matchResponse(resp, matcher) {
-				s.mu.Lock()
-				s.Results.Add(ScanResult{
-					Target:      target,
-					Name:        tmpl.Info.Name,
-					Severity:    tmpl.Info.Severity,
-					Matched:     true,
-					Description: tmpl.Info.Description,
-				})
-				s.mu.Unlock()
-
-				fmt.Printf("✅ [+] %s [%s] → %s\n", tmpl.Info.Name, tmpl.Info.Severity, target)
-				return
-			}
-		}
-	}
 }
 
-func (s *Scanner) matchResponse(resp *utils.Response, matcher templates.Matcher) bool {
-	switch matcher.Type {
-	case "word":
-		text := ""
-		if matcher.Part == "header" {
-			text = resp.Header.Get("Server")
-			if text == "" {
-				text = resp.Header.Get("X-Powered-By")
-			}
-		} else if matcher.Part == "body" {
-			text = resp.BodyContent
-		}
+func (s *Scanner) matchMatchers(
+resp *utils.Response,
+matchers []templates.Matcher,
+condition string,
+) bool {
 
-		for _, word := range matcher.Words {
-			if strings.Contains(strings.ToLower(text), strings.ToLower(word)) {
-				return !matcher.Negative // support negative match later
-			}
-		}
-	case "status":
-		// TODO: implement status code matching
-		return false
-	case "regex":
-		if matcher.Regex != "" {
-			re := regexp.MustCompile(matcher.Regex)
-			if matcher.Part == "body" {
-				return re.MatchString(resp.BodyContent)
-			}
-		}
-	}
+if len(matchers) == 0 {
 	return false
 }
 
+condition = strings.ToLower(strings.TrimSpace(condition))
+
+if condition == "and" {
+
+	for _, matcher := range matchers {
+
+		if !s.matchResponse(resp, matcher) {
+			return false
+		}
+	}
+
+	return true
+}
+
+for _, matcher := range matchers {
+
+	if s.matchResponse(resp, matcher) {
+		return true
+	}
+}
+
+return false
+
+}
+
+func (s *Scanner) matchResponse(
+resp *utils.Response,
+matcher templates.Matcher,
+) bool {
+
+var matched bool
+
+switch strings.ToLower(matcher.Type) {
+
+case "word":
+
+	matched = matchWords(
+		responsePart(resp, matcher.Part),
+		matcher.Words,
+		matcher.Condition,
+	)
+
+case "status":
+
+	for _, code := range matcher.Status {
+
+		if resp.StatusCode == code {
+			matched = true
+			break
+		}
+	}
+
+case "regex":
+
+	for _, rx := range matcher.Regex {
+
+		re, err := regexp.Compile(rx)
+
+		if err != nil {
+			continue
+		}
+
+		if re.MatchString(
+			responsePart(resp, matcher.Part),
+		) {
+			matched = true
+			break
+		}
+	}
+}
+
+if matcher.Negative {
+	return !matched
+}
+
+return matched
+
+}
+
+func matchWords(
+text string,
+words []string,
+condition string,
+) bool {
+
+if len(words) == 0 {
+	return false
+}
+
+text = strings.ToLower(text)
+
+if strings.ToLower(condition) == "and" {
+
+	for _, word := range words {
+
+		if !strings.Contains(
+			text,
+			strings.ToLower(word),
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+for _, word := range words {
+
+	if strings.Contains(
+		text,
+		strings.ToLower(word),
+	) {
+		return true
+	}
+}
+
+return false
+
+}
+
+func responsePart(
+resp *utils.Response,
+part string,
+) string {
+
+switch strings.ToLower(part) {
+
+case "body":
+	return resp.BodyContent
+
+case "header":
+
+	var b strings.Builder
+
+	for k, v := range resp.Header {
+
+		b.WriteString(k)
+		b.WriteString(": ")
+		b.WriteString(strings.Join(v, " "))
+		b.WriteString("\n")
+	}
+
+	return b.String()
+
+default:
+	return resp.BodyContent
+}
+
+}
+
+func normalizeTarget(target string) string {
+
+target = strings.TrimSpace(target)
+
+if target == "" {
+	return target
+}
+
+if strings.HasPrefix(target, "http://") ||
+	strings.HasPrefix(target, "https://") {
+	return target
+}
+
+return "https://" + target
+
+}
+
+func buildRequestURL(baseURL string, path string) string {
+
+path = renderTemplateValue(path, baseURL)
+
+if strings.HasPrefix(path, "http://") ||
+	strings.HasPrefix(path, "https://") {
+	return path
+}
+
+base, err := url.Parse(baseURL)
+
+if err != nil {
+	return path
+}
+
+ref, err := url.Parse(path)
+
+if err != nil {
+	return path
+}
+
+return base.ResolveReference(ref).String()
+
+}
+
+func renderTemplateValue(value string, baseURL string) string {
+
+return strings.ReplaceAll(
+	value,
+	"{{BaseURL}}",
+	strings.TrimRight(baseURL, "/"),
+)
+
+}
+
 func (s *Scanner) SaveResults(outputFile string) {
-	fmt.Printf("📊 Saving results to %s\n", outputFile)
-	s.Results.Print()
 
-	if err := s.Results.SaveJSON(outputFile); err != nil {
-		fmt.Printf("❌ JSON save failed\n")
-	} else {
-		fmt.Printf("✅ JSON saved\n")
-	}
+color.Cyan("Saving report...")
 
-	if err := s.Results.SaveHTML("reports/results.html"); err != nil {
-		fmt.Printf("❌ HTML save failed\n")
-	} else {
-		fmt.Printf("✅ HTML saved\n")
-	}
+if err := s.Results.SaveJSON(outputFile); err != nil {
+	color.Red("JSON save failed: %v", err)
+}
+
+htmlFile := htmlOutputPath(outputFile)
+
+if err := s.Results.SaveHTML(htmlFile); err != nil {
+	color.Red("HTML save failed: %v", err)
+}
+
+}
+
+func htmlOutputPath(outputFile string) string {
+
+ext := filepath.Ext(outputFile)
+
+if ext == "" {
+	return outputFile + ".html"
+}
+
+return strings.TrimSuffix(outputFile, ext) + ".html"
+
 }

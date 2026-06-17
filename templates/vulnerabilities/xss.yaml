@@ -1,18 +1,29 @@
 id: xss-probe
 
 info:
-  name: Reflected XSS Probe
+  name: Reflected Cross Site Scripting (XSS)
   author: khushi-nirsang
   severity: medium
-  description: Basic reflected XSS probe
+  description: |
+    Detects reflected XSS by injecting a script payload and
+    checking whether it is reflected unescaped in the response.
 
 requests:
   - method: GET
+
     path:
-      - "{{BaseURL}}/?search=test%3Cscript%3Ealert(1)%3C/script%3E"
+      - "{{BaseURL}}/?search=%3Cscript%3Ealert(1)%3C%2Fscript%3E"
+
     matchers:
+
       - type: word
         part: body
         words:
           - "<script>alert(1)</script>"
-        condition: and
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and

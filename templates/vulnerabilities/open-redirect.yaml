@@ -1,19 +1,33 @@
 id: open-redirect
 
 info:
-  name: Open Redirect Vulnerability
+  name: Potential Open Redirect
   author: khushi-nirsang
   severity: medium
-  description: Possible open redirect found
+  description: |
+    Detects potential open redirect behavior by checking whether
+    user-supplied external URLs appear in redirect responses.
 
 requests:
   - method: GET
+
     path:
       - "{{BaseURL}}/redirect?url=https://evil.com"
+
     matchers:
+
       - type: word
-        part: body
+        part: header
         words:
           - "evil.com"
-          - "location=https"
-        condition: or
+          - "Location"
+        condition: and
+
+      - type: status
+        status:
+          - 301
+          - 302
+          - 307
+          - 308
+
+    matchers-condition: and

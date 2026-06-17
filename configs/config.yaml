@@ -1,5 +1,59 @@
-threads: 25
+# NeoScanner Configuration
+
+# Maximum concurrent workers
+threads: 50
+
+# HTTP timeout in seconds
 timeout: 10
+
+# Output report file
 output: reports/results.json
-severity: low
+
+# Report directory
+output_dir: reports
+
+# Templates directory
 templates: templates
+
+# Minimum severity to display
+# info | low | medium | high | critical
+severity: info
+
+# User-Agent used for requests
+user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) NeoScanner/1.0
+
+# Follow redirects
+follow_redirects: true
+
+# Maximum redirects allowed
+max_redirects: 5
+
+# Verify TLS certificates
+verify_ssl: true
+
+# Retry failed requests
+retries: 2
+
+# Delay between retries (milliseconds)
+retry_delay: 500
+
+# Save HTML report
+html_report: true
+
+# Save JSON report
+json_report: true
+
+# Display progress while scanning
+show_progress: true
+
+# Show banner on startup
+show_banner: true
+
+# Enable technology fingerprinting
+fingerprinting: true
+
+# Enable colored output
+color_output: true
+
+# OWASP Top 10 mode
+owasp_mode: true

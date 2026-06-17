@@ -1,0 +1,40 @@
+id: idor-detection
+
+info:
+  name: Potential IDOR Exposure
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Detects potential Insecure Direct Object Reference (IDOR)
+    by identifying user-related data exposed through direct object access.
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/account?id=1"
+      - "{{BaseURL}}/account?id=2"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "email"
+          - "username"
+          - "user_id"
+          - "account"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and
+
+    extractors:
+      - type: regex
+        part: body
+        regex:
+          - "(?i)email[^\\n<]*"
+          - "(?i)username[^\\n<]*"

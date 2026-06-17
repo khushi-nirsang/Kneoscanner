@@ -8,10 +8,13 @@ info:
 
 requests:
   - method: GET
+
     path:
       - "{{BaseURL}}/?id=1'"
       - "{{BaseURL}}/?q=1%27+OR+%271%27=%271"
+
     matchers:
+
       - type: word
         part: body
         words:
@@ -19,4 +22,15 @@ requests:
           - "mysql_fetch"
           - "You have an error in your SQL syntax"
           - "ORA-"
+          - "PostgreSQL"
+          - "SQLite"
+          - "ODBC"
+          - "Unclosed quotation mark"
         condition: or
+
+      - type: status
+        status:
+          - 200
+          - 500
+
+    matchers-condition: and

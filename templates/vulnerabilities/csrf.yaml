@@ -1,0 +1,38 @@
+id: csrf-detection
+
+info:
+  name: Missing CSRF Protection
+  author: khushi-nirsang
+  severity: medium
+  description: |
+    Detects forms or sensitive endpoints that may lack CSRF protection
+    by checking for the absence of common CSRF token names.
+
+requests:
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/account/update"
+
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+
+    body: "email=test@example.com&password=123456"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "csrf"
+          - "csrf_token"
+          - "_token"
+          - "authenticity_token"
+        condition: or
+        negative: true
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and

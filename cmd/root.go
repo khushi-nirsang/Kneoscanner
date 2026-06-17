@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"sync"
 
 	"github.com/fatih/color"
 	"github.com/khushi-nirsang/neoscanner/internal/config"
@@ -19,69 +18,106 @@ var (
 	threads     int
 	templateDir string
 	severity    string
+	outputFile  string
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "neoscanner",
-	Short: "NeoScanner - Next Generation Vulnerability Scanner",
-	Long:  `A fast, extensible, template-based vulnerability scanner`,
-	Run: func(cmd *cobra.Command, args []string) {
-		color.Cyan("NeoScanner starting...")
+	Short: "Fast OWASP-focused vulnerability scanner",
+	Long: `NeoScanner
 
-		cfg, err := config.LoadConfig()
-		if err != nil {
-			color.Red("Config error: %v", err)
-			os.Exit(1)
-		}
+A fast, accurate and extensible vulnerability scanner
+focused on OWASP Top 10 vulnerabilities with low false positives.
+`,
+	RunE: runScan,
+}
 
-		if threads > 0 {
-			cfg.Threads = threads
-		}
+func runScan(cmd *cobra.Command, args []string) error {
 
-		scanner := engine.NewScanner(cfg.Threads, cfg.Timeout)
+	color.Cyan("NeoScanner v1.0")
 
-		if templateDir == "" {
-			templateDir = "templates"
-		}
-		scanner.LoadTemplates(templateDir)
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		return fmt.Errorf("config error: %w", err)
+	}
 
-		targets := getTargets(target, targetList)
-		if len(targets) == 0 {
-			color.Red("Error: Use -u <url> or -l <targets.txt>")
-			os.Exit(1)
-		}
+	applyCLIOverrides(cmd, cfg)
 
-		color.Cyan("[*] Starting scan on %d target(s) | Threads: %d | Severity: %s", len(targets), cfg.Threads, severity)
+	targets := getTargets(target, targetList)
 
-		var wg sync.WaitGroup
-		sem := make(chan struct{}, cfg.Threads)
+	if len(targets) == 0 {
+		return fmt.Errorf("no targets supplied, use -u or -l")
+	}
 
-		for _, t := range targets {
-			t = strings.TrimSpace(t)
-			if t == "" {
-				continue
-			}
+	scanner := engine.NewScanner(
+		cfg.Threads,
+		cfg.Timeout,
+	)
 
-			wg.Add(1)
-			sem <- struct{}{}
+	color.Cyan(
+		"[*] Targets: %d | Threads: %d | Severity: %s",
+		len(targets),
+		cfg.Threads,
+		cfg.Severity,
+	)
 
-			go func(url string) {
-				defer wg.Done()
-				defer func() { <-sem }()
+	if err := scanner.LoadTemplates(cfg.Templates); err != nil {
+		return err
+	}
 
-				color.Cyan("[→] Scanning: %s", url)
-				scanner.StartScan(url)
-			}(t)
-		}
+	for _, t := range targets {
+		scanner.StartScan(strings.TrimSpace(t))
+	}
 
-		wg.Wait()
+	scanner.Results.FilterBySeverity(cfg.Severity)
 
-		scanner.SaveResults("reports/results.json")
-		color.Green("\n✅ Scan completed. Total Findings: %d", len(scanner.Results.Items))
-	},
+	scanner.SaveResults(cfg.Output)
+
+	color.Green(
+		"\n✔ Scan completed | Findings: %d",
+		len(scanner.Results.Items),
+	)
+
+	return nil
+}
+
+func applyCLIOverrides(cmd *cobra.Command, cfg *config.Config) {
+
+	if cmd.Flags().Changed("threads") {
+		cfg.Threads = threads
+	}
+
+	if cmd.Flags().Changed("templates") {
+		cfg.Templates = templateDir
+	}
+
+	if cmd.Flags().Changed("severity") {
+		cfg.Severity = severity
+	}
+
+	if cmd.Flags().Changed("output") {
+		cfg.Output = outputFile
+	}
+
+	if cfg.Threads <= 0 {
+		cfg.Threads = 25
+	}
+
+	if cfg.Timeout <= 0 {
+		cfg.Timeout = 10
+	}
+
+	if cfg.Templates == "" {
+		cfg.Templates = "templates"
+	}
+
+	if cfg.Output == "" {
+		cfg.Output = "reports/results.json"
+	}
 }
 
 func getTargets(single, listFile string) []string {
+
 	var targets []string
 
 	if single != "" {
@@ -89,36 +125,114 @@ func getTargets(single, listFile string) []string {
 	}
 
 	if listFile != "" {
+
 		file, err := os.Open(listFile)
 		if err != nil {
-			fmt.Printf("⚠️ Could not open target list: %s\n", listFile)
+			fmt.Printf("Failed to open target list: %s\n", listFile)
 			return targets
 		}
 		defer file.Close()
 
-		fileScanner := bufio.NewScanner(file)
-		for fileScanner.Scan() {
-			line := strings.TrimSpace(fileScanner.Text())
-			if line != "" && !strings.HasPrefix(line, "#") {
-				targets = append(targets, line)
+		scanner := bufio.NewScanner(file)
+
+		for scanner.Scan() {
+
+			line := strings.TrimSpace(scanner.Text())
+
+			if line == "" {
+				continue
 			}
+
+			if strings.HasPrefix(line, "#") {
+				continue
+			}
+
+			targets = append(targets, line)
 		}
 	}
 
-	return targets
+	return removeDuplicates(targets)
+}
+
+func removeDuplicates(targets []string) []string {
+
+	seen := make(map[string]struct{})
+	result := make([]string, 0)
+
+	for _, target := range targets {
+
+		target = strings.TrimSpace(target)
+
+		if target == "" {
+			continue
+		}
+
+		if _, exists := seen[target]; exists {
+			continue
+		}
+
+		seen[target] = struct{}{}
+		result = append(result, target)
+	}
+
+	return result
 }
 
 func init() {
-	rootCmd.Flags().StringVarP(&target, "target", "u", "", "Single target URL")
-	rootCmd.Flags().StringVarP(&targetList, "list", "l", "", "Target list file")
-	rootCmd.Flags().IntVarP(&threads, "threads", "c", 50, "Number of concurrent threads")
-	rootCmd.Flags().StringVarP(&templateDir, "templates", "t", "templates", "Templates directory")
-	rootCmd.Flags().StringVarP(&severity, "severity", "s", "", "Severity filter (info,low,medium,high,critical)")
+
+	rootCmd.Flags().StringVarP(
+		&target,
+		"target",
+		"u",
+		"",
+		"Single target URL",
+	)
+
+	rootCmd.Flags().StringVarP(
+		&targetList,
+		"list",
+		"l",
+		"",
+		"Target list file",
+	)
+
+	rootCmd.Flags().IntVarP(
+		&threads,
+		"threads",
+		"c",
+		25,
+		"Number of concurrent threads",
+	)
+
+	rootCmd.Flags().StringVarP(
+		&templateDir,
+		"templates",
+		"t",
+		"templates",
+		"Templates directory",
+	)
+
+	rootCmd.Flags().StringVarP(
+		&severity,
+		"severity",
+		"s",
+		"",
+		"Minimum severity (info,low,medium,high,critical)",
+	)
+
+	rootCmd.Flags().StringVarP(
+		&outputFile,
+		"output",
+		"o",
+		"",
+		"Output JSON report",
+	)
 }
 
 func Execute() {
+
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		color.Red("Error: %v", err)
 		os.Exit(1)
 	}
 }
