@@ -1,6 +1,6 @@
 # NeoScanner
 
-Next-Gen Vulnerability Scanner (Better than Nessus + Nuclei)
+Next-Gen Vulnerability Scanner
 
 ## Features
 - Fast CLI interface
