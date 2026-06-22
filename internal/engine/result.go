@@ -44,9 +44,10 @@ func (r *Results) Add(result ScanResult) {
 	defer r.mu.Unlock()
 
 	key := fmt.Sprintf(
-		"%s|%s|%s",
+		"%s|%s|%s|%s",
 		result.Target,
 		result.TemplateID,
+		result.Method,
 		result.MatchedURL,
 	)
 

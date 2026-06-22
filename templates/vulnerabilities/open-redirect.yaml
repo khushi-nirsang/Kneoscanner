@@ -4,29 +4,34 @@ info:
   name: Potential Open Redirect
   author: khushi-nirsang
   severity: medium
-  description: |
-    Detects potential open redirect behavior by checking whether
-    user-supplied external URLs appear in redirect responses.
+  description: Detects open redirect vulnerabilities using external redirect payloads.
 
 requests:
   - method: GET
 
     path:
-      - "{{BaseURL}}/redirect?url=https://evil.com"
+      - "{{BaseURL}}/redirect?url={{payload}}"
+
+    payloads:
+      - "payloads/open-redirect/open-redirect-payloads.txt"
 
     matchers:
 
-      - type: word
+      - type: regex
         part: header
-        words:
-          - "evil.com"
-          - "Location"
-        condition: and
+        regex:
+          - "(?i)location:.*evil\\.com"
+          - "(?i)location:.*attacker\\.com"
+          - "(?i)location:.*burpcollaborator"
+          - "(?i)location:.*interactsh"
+          - "(?i)location:.*//"
+          - "(?i)location:.*http"
 
       - type: status
         status:
           - 301
           - 302
+          - 303
           - 307
           - 308
 

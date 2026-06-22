@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>NeoScanner Report</title>
+
+<style>
+
+body{
+font-family:Arial,sans-serif;
+background:#f4f4f4;
+margin:20px;
+}
+
+h1{
+color:#1e3a8a;
+}
+
+.summary{
+display:flex;
+gap:15px;
+margin-bottom:20px;
+}
+
+.card{
+padding:12px;
+background:white;
+border-radius:8px;
+box-shadow:0 0 5px rgba(0,0,0,.1);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+}
+
+th,td{
+padding:10px;
+border:1px solid #ddd;
+text-align:left;
+}
+
+th{
+background:#1e3a8a;
+color:white;
+}
+
+.info{background:#e0f2fe;}
+.low{background:#fef3c7;}
+.medium{background:#fed7aa;}
+.high{background:#fecaca;}
+.critical{background:#fca5a5;}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>NeoScanner Report</h1>
+
+<p>Generated: Sun, 21 Jun 2026 23:37:24 IST</p>
+
+<div class="summary">
+
+<div class="card">Total: 1</div>
+<div class="card">Critical: 0</div>
+<div class="card">High: 0</div>
+<div class="card">Medium: 1</div>
+<div class="card">Low: 0</div>
+<div class="card">Info: 0</div>
+
+</div>
+
+<table>
+
+<tr>
+<th>Target</th>
+<th>URL</th>
+<th>Method</th>
+<th>Status</th>
+<th>Severity</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+
+
+
+<tr class="medium">
+<td>https://demo.testfire.net</td>
+<td>https://demo.testfire.net/search.jsp?query=%22%3E%3Csvg%2Fonload%3Dalert%281%29%3E</td>
+<td>GET</td>
+<td>200</td>
+<td>medium</td>
+<td>Reflected Cross Site Scripting (XSS)</td>
+<td>Detects reflected XSS payloads in responses.</td>
+</tr>
+
+
+
+</table>
+
+</body>
+</html>

@@ -4,33 +4,46 @@ info:
   name: SQL Injection Vulnerability
   author: khushi-nirsang
   severity: critical
-  description: Possible SQL Injection
+  description: Detects possible SQL Injection through error-based responses.
 
 requests:
   - method: GET
 
     path:
-      - "{{BaseURL}}/?id=1'"
-      - "{{BaseURL}}/?q=1%27+OR+%271%27=%271"
+      - "{{BaseURL}}/?id={{payload}}"
+
+    payloads:
+      - "payloads/sqli/sql-injection-all-payloads.txt"
+      - "payloads/sqli/error-based-sql-injection-payloads.txt"
+      - "payloads/sqli/time-based-sql-injections-payloads.txt"
+      - "payloads/sqli/union-select-sql-injection-payloads.txt"
 
     matchers:
 
-      - type: word
+      - type: regex
         part: body
-        words:
-          - "SQL syntax"
-          - "mysql_fetch"
-          - "You have an error in your SQL syntax"
-          - "ORA-"
-          - "PostgreSQL"
-          - "SQLite"
-          - "ODBC"
-          - "Unclosed quotation mark"
-        condition: or
+        regex:
+          - "(?i)sql syntax"
+          - "(?i)you have an error in your sql syntax"
+          - "(?i)warning.*mysql"
+          - "(?i)mysql_fetch"
+          - "(?i)mysql_num_rows"
+          - "(?i)mysqli"
+          - "(?i)postgresql"
+          - "(?i)pg_query"
+          - "(?i)sqlite"
+          - "(?i)sqlite_exception"
+          - "(?i)ora-[0-9]+"
+          - "(?i)microsoft ole db"
+          - "(?i)unclosed quotation mark"
+          - "(?i)sqlserver"
+          - "(?i)syntax error"
+          - "(?i)odbc sql"
+          - "(?i)jdbc"
+          - "(?i)database error"
 
       - type: status
         status:
-          - 200
           - 500
 
-    matchers-condition: and
+    matchers-condition: or

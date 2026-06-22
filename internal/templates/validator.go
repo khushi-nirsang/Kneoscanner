@@ -2,6 +2,7 @@ package templates
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -32,7 +33,11 @@ func ValidateTemplate(t Template) error {
 		return fmt.Errorf("template missing name")
 	}
 
-	if !validSeverities[strings.ToLower(strings.TrimSpace(t.Info.Severity))] {
+	if !validSeverities[
+		strings.ToLower(
+			strings.TrimSpace(t.Info.Severity),
+		),
+	] {
 		return fmt.Errorf(
 			"invalid severity '%s'",
 			t.Info.Severity,
@@ -45,22 +50,15 @@ func ValidateTemplate(t Template) error {
 
 	for reqIndex, req := range t.Requests {
 
-		if !validMethods[strings.ToUpper(strings.TrimSpace(req.Method))] {
+		if !validMethods[
+			strings.ToUpper(
+				strings.TrimSpace(req.Method),
+			),
+		] {
 			return fmt.Errorf(
 				"request %d has unsupported method '%s'",
 				reqIndex,
 				req.Method,
-			)
-		}
-
-		if req.MatchersCondition != "" &&
-			req.MatchersCondition != "and" &&
-			req.MatchersCondition != "or" {
-
-			return fmt.Errorf(
-				"request %d has invalid matchers-condition '%s'",
-				reqIndex,
-				req.MatchersCondition,
 			)
 		}
 
@@ -78,25 +76,31 @@ func ValidateTemplate(t Template) error {
 			)
 		}
 
-		for matcherIndex, matcher := range req.Matchers {
+		for _, payloadFile := range req.Payloads {
 
-			if matcher.Condition != "" &&
-				matcher.Condition != "and" &&
-				matcher.Condition != "or" {
-
-				return fmt.Errorf(
-					"request %d matcher %d has invalid condition '%s'",
-					reqIndex,
-					matcherIndex,
-					matcher.Condition,
-				)
+			if payloadFile == "" {
+				continue
 			}
 
-			switch strings.ToLower(strings.TrimSpace(matcher.Type)) {
+			if _, err := os.Stat(payloadFile); err != nil {
+
+				return fmt.Errorf(
+					"payload file not found: %s",
+					payloadFile,
+				)
+			}
+		}
+
+		for matcherIndex, matcher := range req.Matchers {
+
+			switch strings.ToLower(
+				strings.TrimSpace(matcher.Type),
+			) {
 
 			case "word":
 
 				if len(matcher.Words) == 0 {
+
 					return fmt.Errorf(
 						"request %d matcher %d has no words",
 						reqIndex,
@@ -107,6 +111,7 @@ func ValidateTemplate(t Template) error {
 			case "status":
 
 				if len(matcher.Status) == 0 {
+
 					return fmt.Errorf(
 						"request %d matcher %d has no status codes",
 						reqIndex,
@@ -117,6 +122,7 @@ func ValidateTemplate(t Template) error {
 			case "regex":
 
 				if len(matcher.Regex) == 0 {
+
 					return fmt.Errorf(
 						"request %d matcher %d has no regex",
 						reqIndex,

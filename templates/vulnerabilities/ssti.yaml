@@ -1,0 +1,39 @@
+id: ssti-detection
+
+info:
+  name: Server Side Template Injection (SSTI)
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Detects possible Server Side Template Injection by injecting
+    template expressions and checking whether they are evaluated.
+
+requests:
+  - method: GET
+
+    payloads:
+      - payloads/ssti/ssti-payloads.txt
+
+    path:
+      - "{{BaseURL}}/?q={{payload}}"
+      - "{{BaseURL}}/?search={{payload}}"
+      - "{{BaseURL}}/?name={{payload}}"
+      - "{{BaseURL}}/?message={{payload}}"
+      - "{{BaseURL}}/?input={{payload}}"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "49"
+          - "7777777"
+          - "343"
+          - "1337"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and

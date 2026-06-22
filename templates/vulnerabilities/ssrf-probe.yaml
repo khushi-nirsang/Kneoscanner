@@ -4,15 +4,20 @@ info:
   name: Potential SSRF Exposure
   author: khushi-nirsang
   severity: high
-  description: |
-    Detects potential Server Side Request Forgery by checking
-    whether cloud metadata responses are exposed.
+  description: Detects SSRF using external payload files
 
 requests:
   - method: GET
 
+    payloads:
+      - payloads/ssrf/ssrf.txt
+
     path:
-      - "{{BaseURL}}/?url=http://169.254.169.254/latest/meta-data/"
+      - "{{BaseURL}}/?url={{payload}}"
+      - "{{BaseURL}}/?dest={{payload}}"
+      - "{{BaseURL}}/?redirect={{payload}}"
+      - "{{BaseURL}}/?next={{payload}}"
+      - "{{BaseURL}}/?target={{payload}}"
 
     matchers:
 
@@ -23,6 +28,7 @@ requests:
           - "instance-id"
           - "security-groups"
           - "local-hostname"
+          - "meta-data"
         condition: or
 
       - type: status

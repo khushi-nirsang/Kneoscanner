@@ -6,14 +6,21 @@ info:
   severity: high
   description: |
     Detects potential Insecure Direct Object Reference (IDOR)
-    by identifying user-related data exposed through direct object access.
+    by accessing multiple object identifiers and looking
+    for exposed user/account information.
 
 requests:
   - method: GET
 
+    payloads:
+      - payloads/idor/idor-payloads.txt
+
     path:
-      - "{{BaseURL}}/account?id=1"
-      - "{{BaseURL}}/account?id=2"
+      - "{{BaseURL}}/account?id={{payload}}"
+      - "{{BaseURL}}/user?id={{payload}}"
+      - "{{BaseURL}}/profile?id={{payload}}"
+      - "{{BaseURL}}/api/user/{{payload}}"
+      - "{{BaseURL}}/users/{{payload}}"
 
     matchers:
 
@@ -24,6 +31,10 @@ requests:
           - "username"
           - "user_id"
           - "account"
+          - "first_name"
+          - "last_name"
+          - "phone"
+          - "address"
         condition: or
 
       - type: status
@@ -38,3 +49,5 @@ requests:
         regex:
           - "(?i)email[^\\n<]*"
           - "(?i)username[^\\n<]*"
+          - "(?i)user_id[^\\n<]*"
+          - "(?i)phone[^\\n<]*"
