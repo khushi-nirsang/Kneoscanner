@@ -1,11 +1,11 @@
-# KneoScanner
+# Kneoscanner
 
-KneoScanner is an OWASP-focused web vulnerability scanner with a CLI and a
+Kneoscanner is an OWASP-focused web vulnerability scanner with a CLI and a
 local browser GUI. It loads YAML templates, crawls same-origin application
 routes, mutates discovered parameters in authorized active scans, and writes
 JSON, HTML, PDF, and SARIF reports.
 
-> Use KneoScanner only on applications you own or are explicitly authorized to
+> Use Kneoscanner only on applications you own or are explicitly authorized to
 > test. Active and intrusive profiles send mutation payloads.
 
 ## Requirements
@@ -16,8 +16,8 @@ JSON, HTML, PDF, and SARIF reports.
 ## Install From Git Clone
 
 ```bash
-git clone https://github.com/khushi-nirsang/neoscanner.git
-cd neoscanner
+git clone https://github.com/khushi-nirsang/Kneoscanner.git
+cd Kneoscanner
 go mod download
 go build -o kneoscanner .
 ```
@@ -25,8 +25,8 @@ go build -o kneoscanner .
 On Windows PowerShell:
 
 ```powershell
-git clone https://github.com/khushi-nirsang/neoscanner.git
-cd neoscanner
+git clone https://github.com/khushi-nirsang/Kneoscanner.git
+cd Kneoscanner
 go mod download
 go build -o kneoscanner.exe .
 ```
@@ -94,7 +94,7 @@ same AI summary in GUI status and reports.
 - `active`: OWASP mutation checks such as XSS, SQL injection, SSRF, path traversal, SSTI, and open redirect. Requires `--acknowledge-authorization`.
 - `intrusive`: higher-risk checks such as command injection and race/mass-assignment style probes. Requires `--acknowledge-authorization`.
 
-If an active scan discovers input parameters, KneoScanner tests those inputs
+If an active scan discovers input parameters, Kneoscanner tests those inputs
 first. If no eligible input is discovered, it falls back to the built-in
 template paths so lab/demo applications can still be tested.
 
