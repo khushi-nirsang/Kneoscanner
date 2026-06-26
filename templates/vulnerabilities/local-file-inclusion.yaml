@@ -1,0 +1,50 @@
+id: local-file-inclusion
+
+info:
+  name: Local File Inclusion (LFI)
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Detects Local File Inclusion vulnerabilities that allow
+    reading arbitrary files from the local filesystem.
+  tags:
+    - lfi
+    - access-control
+    - a01:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/?file={{payload}}"
+      - "{{BaseURL}}/page?id={{payload}}"
+      - "{{BaseURL}}/load?document={{payload}}"
+
+    payloads:
+      - "payloads/lfi/lfi-payloads.txt"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "root:x:"
+          - "bin/bash"
+          - "<?php"
+          - "<?xml"
+          - "apache"
+          - "nginx"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and
+
+    extractors:
+      - type: regex
+        part: body
+        regex:
+          - "root:.*:0:0:"
+          - "<?php.*?>"

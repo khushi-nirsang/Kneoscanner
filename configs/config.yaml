@@ -1,4 +1,4 @@
-# NeoScanner Configuration
+# KneoScanner Configuration
 
 # Maximum concurrent workers
 threads: 50
@@ -20,7 +20,12 @@ templates: templates
 severity: info
 
 # User-Agent used for requests
-user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) NeoScanner/1.0
+user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) KneoScanner/1.0
+
+# Optional authenticated-scanning headers. These are applied to discovery and
+# scan requests, and are redacted from report evidence.
+# auth_headers:
+#   Authorization: "Bearer replace-with-your-token"
 
 # Follow redirects
 follow_redirects: true
@@ -37,11 +42,31 @@ retries: 2
 # Delay between retries (milliseconds)
 retry_delay: 500
 
+# Maximum response body retained and inspected for each request (bytes)
+max_response_bytes: 2097152
+
+# Persist bounded, sanitized HTTP evidence with findings.
+evidence_max_bytes: 65536
+redact_sensitive_data: true
+
+# Keep template requests on the target host unless this is explicitly enabled.
+allow_external_urls: false
+
+# Application discovery
+crawl: true
+crawl_max_depth: 3
+crawl_max_pages: 100
+discover_scripts: true
+discover_openapi: true
+
 # Save HTML report
 html_report: true
 
 # Save JSON report
 json_report: true
+
+# Save SARIF report for CI/code-scanning platforms
+sarif_report: true
 
 # Display progress while scanning
 show_progress: true
@@ -57,3 +82,11 @@ color_output: true
 
 # OWASP Top 10 mode
 owasp_mode: true
+
+# AI analyst summary. Local mode works offline. Set ai_provider: openai and
+# provide OPENAI_API_KEY to use the OpenAI-compatible endpoint.
+ai_enabled: false
+ai_provider: local
+ai_endpoint: https://api.openai.com/v1/chat/completions
+ai_model: gpt-4o-mini
+ai_api_key_env: OPENAI_API_KEY

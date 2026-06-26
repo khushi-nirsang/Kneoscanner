@@ -13,6 +13,7 @@ type Template struct {
 	Info     Info        `yaml:"info"`
 	Requests []Request   `yaml:"requests"`
 	Tags     StringSlice `yaml:"tags,omitempty"`
+	Disabled bool        `yaml:"disabled,omitempty"`
 }
 
 type Info struct {
@@ -20,9 +21,17 @@ type Info struct {
 	Author      string      `yaml:"author"`
 	Severity    string      `yaml:"severity"`
 	Description string      `yaml:"description,omitempty"`
+	Confidence  string      `yaml:"confidence,omitempty"`
+	Risk        string      `yaml:"risk,omitempty"`
+	CWE         StringSlice `yaml:"cwe,omitempty"`
+	CVSSScore   float64     `yaml:"cvss-score,omitempty"`
+	CVSSVector  string      `yaml:"cvss-vector,omitempty"`
+	Impact      string      `yaml:"impact,omitempty"`
 
-	Tags       StringSlice `yaml:"tags,omitempty"`
-	References StringSlice `yaml:"references,omitempty"`
+	Tags        StringSlice `yaml:"tags,omitempty"`
+	References  StringSlice `yaml:"references,omitempty"`
+	CVEs        StringSlice `yaml:"cve,omitempty"`
+	Remediation string      `yaml:"remediation,omitempty"`
 }
 
 type Request struct {
@@ -39,7 +48,8 @@ type Request struct {
 
 	Timeout int `yaml:"timeout,omitempty"`
 
-	Redirects bool `yaml:"redirects,omitempty"`
+	// Nil uses the scanner policy; true and false explicitly override it.
+	Redirects *bool `yaml:"redirects,omitempty"`
 
 	Matchers []Matcher `yaml:"matchers"`
 
@@ -152,9 +162,7 @@ func (h *Headers) UnmarshalYAML(value *yaml.Node) error {
 				)
 			}
 
-			headers[
-				strings.TrimSpace(parts[0]),
-			] = strings.TrimSpace(parts[1])
+			headers[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
 		}
 
 	case yaml.ScalarNode:

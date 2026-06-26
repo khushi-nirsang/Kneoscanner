@@ -1,0 +1,9 @@
+rO0ABXNyADJjb20uc3luaWZpLmhpZXJhcmNoaWNhbC5jb3JlLmltcGwuVGFyZ2V0R3JvdXBJbXBs
+aced00057200156c6f63617465646f626a
+gAP/AAB4cAA=
+Tzo0OiJFcnJvciI6Mzp7czo1OiJtc2d0Ijt
+Tzo0OiJPYmoiOjI6e3M6MzoicHJvIjtpOjE7cy4zOiJwdXIiO3M6MzoidmFyIjt9
+O:3:"Foo":1:{s:3:"bar";O:3:"Baz":0:{}}
+a:1:{i:0;O:6:"Object":1:{s:8:"property";s:4:"test";}}
+Tzo0OiJUZXN0Ijox
+a:2:{i:0;s:4:"test";i:1;O:6:"Object":1:{s:8:"property";s:4:"test";}}

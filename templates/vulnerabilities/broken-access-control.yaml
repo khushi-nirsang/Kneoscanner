@@ -1,0 +1,72 @@
+id: broken-access-control
+
+info:
+  name: Broken Access Control
+  author: khushi-nirsang
+  severity: critical
+  description: |
+    Detects broken access control including authorization bypass,
+    privilege escalation, and improper access restrictions.
+  tags:
+    - access-control
+    - broken-ac
+    - a01:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/admin"
+      - "{{BaseURL}}/admin/users"
+      - "{{BaseURL}}/api/admin"
+      - "{{BaseURL}}/moderator"
+      - "{{BaseURL}}/staff"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "admin panel"
+          - "administration"
+          - "user management"
+          - "settings"
+          - "delete user"
+          - "manage roles"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and
+
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/api/user/delete"
+      - "{{BaseURL}}/api/admin/add"
+      - "{{BaseURL}}/api/role/change"
+
+    headers:
+      Content-Type: application/json
+
+    body: '{"user_id":"1","action":"delete"}'
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "success"
+          - "deleted"
+          - "updated"
+          - "modified"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+          - 201
+
+    matchers-condition: and

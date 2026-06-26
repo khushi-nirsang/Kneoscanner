@@ -1,0 +1,35 @@
+id: no-rate-limiting
+
+info:
+  name: Missing Rate Limiting
+  author: khushi-nirsang
+  severity: medium
+  description: |
+    Detects missing rate limiting on sensitive endpoints
+    which could allow brute force attacks.
+  tags:
+    - rate-limiting
+    - identification-and-auth
+    - a07:2021
+
+requests:
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/api/login"
+      - "{{BaseURL}}/api/password-reset"
+      - "{{BaseURL}}/api/otp-verify"
+
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+
+    body: "username=test&password=test"
+
+    matchers:
+
+      - type: status
+        status:
+          - 200
+          - 401
+
+    matchers-condition: and

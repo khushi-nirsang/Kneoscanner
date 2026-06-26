@@ -1,0 +1,60 @@
+id: path-traversal
+
+info:
+  name: Path Traversal / Directory Traversal
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Detects path traversal vulnerabilities allowing unauthorized
+    access to files outside the intended directory by using
+    directory traversal sequences.
+  tags:
+    - path-traversal
+    - access-control
+    - a01:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/?file={{payload}}"
+      - "{{BaseURL}}/download?path={{payload}}"
+      - "{{BaseURL}}/view?doc={{payload}}"
+      - "{{BaseURL}}/get?id={{payload}}"
+      - "{{BaseURL}}/read?filename={{payload}}"
+
+    payloads:
+      - "payloads/path-traversal/path-traversal-payloads.txt"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "root:x:"
+          - "apache:"
+          - "nginx:"
+          - "Application/json"
+          - "<?php"
+          - "<?xml"
+        condition: or
+
+      - type: regex
+        part: body
+        regex:
+          - "(?i)database_password"
+          - "(?i)api_key"
+          - "(?i)secret_key"
+          - "(?i)mysql_password"
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and
+
+    extractors:
+      - type: regex
+        part: body
+        regex:
+          - "(?i)(password|secret|key|token)[\\s]*[=:][\\s]*['\"][^'\"]+['\"]"

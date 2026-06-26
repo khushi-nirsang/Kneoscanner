@@ -8,6 +8,11 @@ info:
     Detects potential Insecure Direct Object Reference (IDOR)
     by accessing multiple object identifiers and looking
     for exposed user/account information.
+  tags:
+    - idor
+    - access-control
+    - a01:2021
+    - a4:2017
 
 requests:
   - method: GET

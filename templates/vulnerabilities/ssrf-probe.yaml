@@ -5,6 +5,11 @@ info:
   author: khushi-nirsang
   severity: high
   description: Detects SSRF using external payload files
+  tags:
+    - ssrf
+    - injection
+    - a10:2021
+    - a9:2017
 
 requests:
   - method: GET
@@ -28,11 +33,20 @@ requests:
           - "instance-id"
           - "security-groups"
           - "local-hostname"
-          - "meta-data"
         condition: or
 
       - type: status
         status:
           - 200
+
+      # Do not confuse reflected/rejected URL text with a server-side fetch.
+      - type: word
+        part: body
+        words:
+          - "requested resource"
+          - "not available"
+          - "/static/http://"
+        condition: or
+        negative: true
 
     matchers-condition: and

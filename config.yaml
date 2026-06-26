@@ -1,5 +1,64 @@
 threads: 25
 timeout: 10
 output: reports/results.json
+history_file: reports/history.json
+baseline_file: ""
 severity: low
+fail_on: ""
 templates: templates
+
+# HTTP policy
+user_agent: KneoScanner/1.0
+
+# Optional authenticated-scanning headers. Keep secrets out of templates; they
+# are automatically redacted from stored finding evidence.
+# auth_headers:
+#   Authorization: "Bearer replace-with-your-token"
+#   Cookie: "session=replace-with-your-session"
+follow_redirects: true
+max_redirects: 5
+verify_ssl: true
+retries: 2
+retry_delay: 500
+max_response_bytes: 2097152
+
+# Template requests must stay on the target host unless explicitly allowed.
+allow_external_urls: false
+
+# Application discovery
+crawl: true
+crawl_max_depth: 3
+crawl_max_pages: 100
+discover_scripts: true
+discover_openapi: true
+discover_sitemap: true
+# Optional browser/proxy traffic inventory. Only request URLs and methods are imported.
+har_file: ""
+
+# Active testing is restricted to discovered GET query parameters in this stage.
+active_parameter_testing: true
+max_parameter_mutations: 200
+payloads_per_parameter: 5
+
+# POST form testing runs only when --parameter explicitly selects fields.
+active_post_form_testing: true
+max_post_form_mutations: 50
+scan_profile: safe
+request_delay: 100
+
+# Evidence is included in reports for verification. Keep it bounded and redact
+# credentials/cookies by default.
+evidence_max_bytes: 65536
+redact_sensitive_data: true
+
+# A detailed PDF report is saved automatically beside the JSON report.
+pdf_report: true
+sarif_report: true
+
+# AI analyst summary. Local mode requires no API key. Use provider "openai"
+# with OPENAI_API_KEY for an OpenAI-compatible remote summary.
+ai_enabled: false
+ai_provider: local
+ai_endpoint: https://api.openai.com/v1/chat/completions
+ai_model: gpt-4o-mini
+ai_api_key_env: OPENAI_API_KEY

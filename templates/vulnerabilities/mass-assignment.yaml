@@ -1,0 +1,49 @@
+id: mass-assignment
+
+info:
+  name: Mass Assignment / Parameter Pollution
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Detects mass assignment vulnerabilities where user-supplied
+    parameters can be used to set restricted object properties.
+  tags:
+    - mass-assignment
+    - access-control
+    - a01:2021
+
+requests:
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/api/user/create"
+      - "{{BaseURL}}/api/user/update"
+      - "{{BaseURL}}/api/profile"
+
+    headers:
+      Content-Type: application/json
+
+    body: '{"username":"test","is_admin":true,"role":"admin","email":"test@test.com"}'
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "success"
+          - "updated"
+          - "created"
+        condition: or
+
+      - type: regex
+        part: body
+        regex:
+          - "(?i)\"is_admin\"\\s*:\\s*true"
+          - "(?i)\"role\"\\s*:\\s*\"admin\""
+
+      - type: status
+        status:
+          - 200
+          - 201
+
+    matchers-condition: and

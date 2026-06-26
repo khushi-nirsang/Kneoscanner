@@ -4,19 +4,29 @@ info:
   name: SQL Injection Vulnerability
   author: khushi-nirsang
   severity: critical
-  description: Detects possible SQL Injection through error-based responses.
+  description: Detects possible SQL Injection through error-based responses, time delays, or behavioral analysis.
+  tags:
+    - sql-injection
+    - injection
+    - a03:2021
+    - a03:2017
 
 requests:
   - method: GET
 
     path:
       - "{{BaseURL}}/?id={{payload}}"
+      - "{{BaseURL}}/?search={{payload}}"
+      - "{{BaseURL}}/?q={{payload}}"
+      - "{{BaseURL}}/?user={{payload}}"
+      - "{{BaseURL}}/?product={{payload}}"
+      - "{{BaseURL}}/search?query={{payload}}"
+      - "{{BaseURL}}/product?id={{payload}}"
+      - "{{BaseURL}}/api/search?q={{payload}}"
 
     payloads:
-      - "payloads/sqli/sql-injection-all-payloads.txt"
       - "payloads/sqli/error-based-sql-injection-payloads.txt"
-      - "payloads/sqli/time-based-sql-injections-payloads.txt"
-      - "payloads/sqli/union-select-sql-injection-payloads.txt"
+      - "payloads/sqli/sql-injection-all-payloads.txt"
 
     matchers:
 
@@ -37,13 +47,34 @@ requests:
           - "(?i)microsoft ole db"
           - "(?i)unclosed quotation mark"
           - "(?i)sqlserver"
-          - "(?i)syntax error"
-          - "(?i)odbc sql"
+          - "(?i)odbc"
           - "(?i)jdbc"
           - "(?i)database error"
+          - "(?i)column.*not.*found"
+          - "(?i)table.*not.*found"
+
+    matchers-condition: or
+
+  - method: GET
+    
+    path:
+      - "{{BaseURL}}/?id={{payload}}"
+      - "{{BaseURL}}/?search={{payload}}"
+      - "{{BaseURL}}/search?query={{payload}}"
+
+    payloads:
+      - "payloads/sqli/union-select-sql-injection-payloads.txt"
+
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "union"
+          - "select"
+        condition: and
 
       - type: status
         status:
-          - 500
+          - 200
 
-    matchers-condition: or
+    matchers-condition: and

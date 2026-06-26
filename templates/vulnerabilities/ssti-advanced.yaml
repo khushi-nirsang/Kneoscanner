@@ -1,0 +1,47 @@
+id: server-side-template-injection-advanced
+
+info:
+  name: Advanced Server-Side Template Injection (SSTI)
+  author: khushi-nirsang
+  severity: critical
+  description: |
+    Advanced SSTI detection for frameworks like Jinja2, Mako,
+    Velocity, and other template engines through code execution.
+  tags:
+    - ssti
+    - injection
+    - a03:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/?name={{payload}}"
+      - "{{BaseURL}}/api/greet?user={{payload}}"
+
+    payloads:
+      - "payloads/ssti/ssti-advanced-payloads.txt"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "7"
+          - "49"
+          - "root:"
+          - "/bin/"
+        condition: or
+
+      - type: regex
+        part: body
+        regex:
+          - "(?i)jinja2"
+          - "(?i)mako"
+          - "(?i)velocity"
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and

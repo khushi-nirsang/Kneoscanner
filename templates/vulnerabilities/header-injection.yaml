@@ -1,0 +1,47 @@
+id: header-injection
+
+info:
+  name: HTTP Header Injection
+  author: khushi-nirsang
+  severity: medium
+  description: |
+    Detects HTTP header injection vulnerabilities by injecting
+    CRLF sequences and analyzing response headers.
+  tags:
+    - header-injection
+    - injection
+    - a03:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/?redirect={{payload}}"
+      - "{{BaseURL}}/?next={{payload}}"
+      - "{{BaseURL}}/api?url={{payload}}"
+
+    payloads:
+      - "payloads/header-injection/header-injection-payloads.txt"
+
+    matchers:
+
+      - type: regex
+        part: header
+        regex:
+          - "(?i)X-Injected.*true"
+          - "(?i)X-Custom-Header"
+          - "(?i)Set-Cookie.*injected"
+          - "(?m)\\r\\n[a-zA-Z-]+:\\s"
+
+      - type: status
+        status:
+          - 200
+          - 302
+
+    matchers-condition: and
+
+    extractors:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)set-cookie.*"

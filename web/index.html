@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KneoScanner Workspace</title>
+  <link rel="stylesheet" href="/web/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="/assets/kneoscanner-logo.png" alt="KneoScanner logo">
+        <div>
+          <h1>KneoScanner</h1>
+          <p>Security operations workspace</p>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Workspace navigation">
+        <button class="active" data-view="overview">Overview</button>
+        <button data-view="scan">Scan setup</button>
+        <button data-view="findings">Findings</button>
+        <button data-view="history">History</button>
+        <button data-view="templates">Templates</button>
+        <button data-view="config">Runtime config</button>
+      </nav>
+      <p class="sidebar-note">Loopback-only GUI. Evidence is redacted by default.</p>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="viewTitle">Overview</h2>
+          <p id="viewSubtitle">Command center for scan status, triage, and reports.</p>
+        </div>
+        <div class="top-actions">
+          <button class="secondary" id="quickScan">New scan</button>
+          <div id="reports" class="reports"></div>
+        </div>
+      </header>
+
+      <section id="overview" class="view active">
+        <div class="metrics" id="metrics"></div>
+        <div class="metrics" id="reviewMetrics"></div>
+        <div class="grid two">
+          <section class="card">
+            <h3>Scan status</h3>
+            <p id="status" class="status">Ready.</p>
+            <button class="secondary hide" id="cancelScan">Cancel scan</button>
+            <div id="activity" class="activity"></div>
+          </section>
+          <section class="card">
+            <h3>Safety</h3>
+            <p class="warning">Active and intrusive modes can mutate requests. Scan only owned or explicitly authorized targets.</p>
+            <p>Use the Findings view to validate evidence, preserve analyst notes, and export reviewed results.</p>
+          </section>
+          <section class="card">
+            <h3>AI analyst</h3>
+            <div id="aiSummary" class="empty">Enable AI analysis in Scan setup to generate an analyst summary after a scan.</div>
+          </section>
+        </div>
+      </section>
+
+      <section id="scan" class="view">
+        <form id="scanForm" class="card">
+          <div class="section-head">
+            <div>
+              <h3>New scan</h3>
+              <p>Targets, profile, authorization, and scan policy.</p>
+            </div>
+            <select id="preset">
+              <option value="">Custom settings</option>
+              <option value="passive_recon">Passive recon</option>
+              <option value="safe_web">Safe web app scan</option>
+              <option value="active_params">Active parameter testing</option>
+              <option value="intrusive_lab">Intrusive lab validation</option>
+            </select>
+          </div>
+
+          <label>Primary target URL</label>
+          <input id="target" required placeholder="https://staging.example.com">
+
+          <label>Additional targets</label>
+          <textarea id="targetList" rows="4" placeholder="One target per line, comma, or semicolon"></textarea>
+          <p class="muted" id="targetCount">1 target configured</p>
+
+          <div class="form-grid">
+            <div><label>Profile</label><select id="profile"><option value="passive">Passive</option><option value="safe" selected>Safe</option><option value="active">Active</option><option value="intrusive">Intrusive</option></select></div>
+            <div><label>Threads</label><input id="threads" type="number" min="1" max="200" value="25"></div>
+            <div><label>Minimum severity</label><select id="severity"><option value="">All findings</option><option value="info">Info</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="critical">Critical</option></select></div>
+            <div><label>Active parameters</label><input id="parameters" placeholder="id, search, q, url"></div>
+            <div><label>User-Agent</label><input id="userAgent" placeholder="KneoScanner/1.0"></div>
+            <div><label>Auth header</label><input id="authHeader" placeholder="Authorization: Bearer token"></div>
+            <div><label>Cookie header</label><input id="cookieHeader" placeholder="session=..."></div>
+            <div><label>Timeout seconds</label><input id="timeoutSeconds" type="number" min="1" max="300" value="10"></div>
+            <div><label>Retries</label><input id="retries" type="number" min="0" max="10" value="2"></div>
+            <div><label>Retry delay ms</label><input id="retryDelay" type="number" min="0" max="10000" value="500"></div>
+            <div><label>Request delay ms</label><input id="requestDelay" type="number" min="0" max="60000" value="100"></div>
+            <div><label>Max response bytes</label><input id="maxRespBytes" type="number" min="1024" value="2097152"></div>
+            <div><label>Crawl max depth</label><input id="crawlMaxDepth" type="number" min="0" max="20" value="3"></div>
+            <div><label>Crawl max pages</label><input id="crawlMaxPages" type="number" min="1" max="10000" value="100"></div>
+            <div><label>AI provider</label><select id="aiProvider"><option value="local">Local analyst</option><option value="openai">OpenAI-compatible</option></select></div>
+            <div><label>AI model</label><input id="aiModel" placeholder="gpt-4o-mini" value="gpt-4o-mini"></div>
+          </div>
+
+          <div class="checks">
+            <label><input id="crawlEnabled" type="checkbox" checked> Crawl links/forms/API routes</label>
+            <label><input id="followRedirects" type="checkbox" checked> Follow redirects</label>
+            <label><input id="verifySSL" type="checkbox" checked> Verify TLS certificates</label>
+            <label><input id="allowExternal" type="checkbox"> Allow external template URLs</label>
+            <label><input id="discoverOpenAPI" type="checkbox" checked> OpenAPI discovery</label>
+            <label><input id="discoverSitemap" type="checkbox" checked> Sitemap discovery</label>
+            <label><input id="discoverScripts" type="checkbox" checked> JavaScript route discovery</label>
+            <label><input id="activeParamTesting" type="checkbox" checked> Parameter mutation checks</label>
+            <label><input id="activePostTesting" type="checkbox" checked> POST form mutation checks</label>
+            <label><input id="aiEnabled" type="checkbox"> Generate AI analyst summary</label>
+          </div>
+
+          <label class="auth-check"><input id="authorization" type="checkbox"> I confirm I am authorized to scan this target.</label>
+          <div class="actions">
+            <button id="submitScan">Start scan</button>
+            <button class="secondary" id="exportPolicy" type="button">Export policy JSON</button>
+            <button class="secondary" id="importPolicyButton" type="button">Import policy JSON</button>
+            <input id="importPolicyFile" class="hide" type="file" accept="application/json,.json">
+          </div>
+        </form>
+      </section>
+
+      <section id="findings" class="view">
+        <div class="split">
+          <section class="card">
+            <div class="section-head">
+              <div><h3>Findings</h3><p id="count">0 findings</p></div>
+              <div class="filters">
+                <input id="search" placeholder="Search name, URL, CWE, evidence, notes">
+                <select id="severityFilter"><option value="">All severities</option><option>critical</option><option>high</option><option>medium</option><option>low</option><option>info</option></select>
+                <select id="confidenceFilter"><option value="">All confidence</option><option>confirmed</option><option>firm</option><option>potential</option></select>
+                <select id="reviewFilter"><option value="">All review states</option><option value="unreviewed">Unreviewed</option><option value="reviewed">Reviewed</option><option value="false_positive">False positive</option><option value="has_notes">Has notes</option><option value="missing_notes">Missing notes</option></select>
+                <select id="sort"><option value="severity">Sort: severity</option><option value="name">Sort: name</option><option value="url">Sort: URL</option></select>
+              </div>
+            </div>
+            <div class="bulk">
+              <span id="selectedCount">0 selected</span>
+              <button class="secondary" id="selectVisible">Select visible</button>
+              <button class="secondary" id="clearSelection">Clear</button>
+              <button class="secondary" id="bulkReviewed">Mark reviewed</button>
+              <button class="secondary" id="bulkFalsePositive">False positive</button>
+              <button class="secondary" id="exportSelected">Export selected</button>
+              <button class="secondary" id="exportVisibleCsv">Export visible CSV</button>
+            </div>
+            <div id="findingList" class="empty">Run a scan to populate findings.</div>
+          </section>
+          <aside id="details" class="card detail">
+            <div class="empty">Select a finding to inspect evidence, remediation, and sanitized HTTP transcripts.</div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="history" class="view">
+        <section class="card">
+          <div class="section-head"><div><h3>Scan history</h3><p id="historyCount">No history loaded.</p></div><button class="secondary" id="refreshHistory">Refresh</button></div>
+          <div id="historyList" class="empty">No scan history yet.</div>
+        </section>
+      </section>
+
+      <section id="templates" class="view">
+        <section class="card">
+          <div class="section-head"><div><h3>Template inventory</h3><p id="templateCount">No templates loaded.</p></div><button class="secondary" id="refreshTemplates">Refresh</button></div>
+          <div class="filters"><input id="templateSearch" placeholder="Search templates"><select id="templateSeverity"><option value="">All severities</option><option>critical</option><option>high</option><option>medium</option><option>low</option><option>info</option></select><select id="templateStatus"><option value="">Valid and invalid</option><option value="valid">Valid only</option><option value="invalid">Invalid only</option></select></div>
+          <div id="templateList" class="empty">Loading templates...</div>
+        </section>
+      </section>
+
+      <section id="config" class="view">
+        <section class="card">
+          <div class="section-head"><div><h3>Runtime configuration</h3><p>Configuration currently loaded by the GUI.</p></div><button class="secondary" id="refreshConfig">Refresh</button></div>
+          <div id="configList" class="empty">Loading config...</div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast hide"></div>
+  <script src="/web/app.js"></script>
+</body>
+</html>

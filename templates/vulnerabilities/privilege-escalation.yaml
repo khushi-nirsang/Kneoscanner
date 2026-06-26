@@ -1,0 +1,66 @@
+id: privilege-escalation
+
+info:
+  name: Privilege Escalation
+  author: khushi-nirsang
+  severity: critical
+  description: |
+    Detects privilege escalation vulnerabilities where users
+    can escalate their privileges from standard user to admin.
+  tags:
+    - privilege-escalation
+    - access-control
+    - a01:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/api/user/role"
+      - "{{BaseURL}}/api/profile"
+      - "{{BaseURL}}/user/info"
+
+    matchers:
+
+      - type: regex
+        part: body
+        regex:
+          - "(?i)\"role\"\\s*:\\s*\"admin\""
+          - "(?i)\"is_admin\"\\s*:\\s*true"
+          - "(?i)\"privilege\"\\s*:\\s*\"admin\""
+          - "(?i)admin.*true"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and
+
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/api/user/update"
+      - "{{BaseURL}}/api/profile/edit"
+
+    headers:
+      Content-Type: application/json
+
+    body: '{"role":"admin","is_admin":true}'
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "success"
+          - "updated"
+          - "admin"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+          - 201
+
+    matchers-condition: and

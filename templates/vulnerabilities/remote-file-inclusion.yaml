@@ -1,0 +1,44 @@
+id: remote-file-inclusion
+
+info:
+  name: Remote File Inclusion (RFI)
+  author: khushi-nirsang
+  severity: critical
+  description: |
+    Detects Remote File Inclusion vulnerabilities that allow
+    attackers to include files from remote servers, leading
+    to arbitrary code execution.
+  tags:
+    - rfi
+    - injection
+    - a03:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/?file={{payload}}"
+      - "{{BaseURL}}/include?page={{payload}}"
+      - "{{BaseURL}}/load?module={{payload}}"
+      - "{{BaseURL}}/page?url={{payload}}"
+
+    payloads:
+      - "payloads/rfi/rfi-payloads.txt"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "attacker.com"
+          - "evil.com"
+          - "php"
+          - "javascript"
+          - "eval"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and

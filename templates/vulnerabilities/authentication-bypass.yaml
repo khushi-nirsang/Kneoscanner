@@ -1,0 +1,45 @@
+id: authentication-bypass
+
+info:
+  name: Authentication Bypass
+  author: khushi-nirsang
+  severity: critical
+  description: |
+    Detects common authentication bypass techniques including
+    SQL injection in auth forms, default credentials, and
+    weak authentication mechanisms.
+  tags:
+    - authentication-bypass
+    - identification-and-auth
+    - a07:2021
+
+requests:
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/doLogin"
+      - "{{BaseURL}}/login.jsp"
+
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+
+    body: "uid={{username}}&passw={{password}}"
+
+    payloads:
+      - "payloads/auth-bypass/bypass-payloads.txt"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          # These are authenticated-area markers. Generic terms such as
+          # "login", "user", or a 200 status are not evidence of a bypass.
+          - "sign off"
+          - "account summary"
+          - "transaction history"
+          - "personal information"
+          - "welcome back"
+        condition: or
+
+    matchers-condition: and

@@ -1,0 +1,58 @@
+id: weak-authentication
+
+info:
+  name: Weak Authentication & Default Credentials
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Attempts to detect weak authentication implementations
+    and access with common default credentials.
+  tags:
+    - weak-auth
+    - identification-and-auth
+    - a07:2021
+
+requests:
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/login"
+      - "{{BaseURL}}/api/auth"
+
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+
+    body: "username={{username}}&password={{password}}"
+
+    payloads:
+      - "payloads/weak-auth/default-credentials.txt"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "success"
+          - "authenticated"
+          - "welcome"
+          - "dashboard"
+          - "user_id"
+        condition: or
+
+      - type: regex
+        part: header
+        regex:
+          - "(?i)set-cookie.*session"
+
+      - type: status
+        status:
+          - 200
+          - 302
+
+    matchers-condition: and
+
+    extractors:
+      - type: regex
+        part: body
+        regex:
+          - "(?i)token[\\s]*[=:][\\s]*['\"]([^'\"]+)['\"]"

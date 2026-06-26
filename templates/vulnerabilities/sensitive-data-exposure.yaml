@@ -1,0 +1,53 @@
+id: sensitive-data-exposure
+
+info:
+  name: Sensitive Data Exposure
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Detects exposure of sensitive information including
+    API keys, tokens, passwords, and other credentials
+    in responses and error messages.
+  tags:
+    - sensitive-data
+    - cryptographic-failures
+    - a02:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/api/user"
+      - "{{BaseURL}}/api/config"
+      - "{{BaseURL}}/debug"
+      - "{{BaseURL}}/error"
+      - "{{BaseURL}}/"
+
+    matchers:
+
+      - type: regex
+        part: body
+        regex:
+          - "(?i)(api[_-]?key|apikey)[\\s]*[=:][\\s]*['\"]?([a-zA-Z0-9\\-_.]{20,})['\"]?"
+          - "(?i)(password|passwd|pwd)[\\s]*[=:][\\s]*['\"]([^'\"]{1,})['\"]"
+          - "(?i)(secret|secret_key|sk_live)[\\s]*[=:][\\s]*['\"]?([a-zA-Z0-9\\-_.]{20,})['\"]?"
+          - "(?i)(token|access_token|auth_token)[\\s]*[=:][\\s]*['\"]?([a-zA-Z0-9\\-_.]{20,})['\"]?"
+          - "(?i)(private_key|private.key)[\\s]*[=:][\\s]*['\"]([^'\"]{20,})['\"]"
+          - "(?i)aws_secret_access_key[\\s]*[=:]"
+          - "(?i)database_password[\\s]*[=:][\\s]*['\"]([^'\"]{1,})['\"]"
+          - "(?i)(aws_access_key_id|aws_secret_access_key)[\\s]*[=:]"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+          - 500
+
+    matchers-condition: and
+
+    extractors:
+      - type: regex
+        part: body
+        regex:
+          - "(?i)api[_-]?key[\\s]*[=:][\\s]*['\"]?([a-zA-Z0-9\\-_.]{20,})['\"]?"
+          - "(?i)(password|secret|token)[\\s]*[=:][\\s]*['\"]([^'\"]{1,})['\"]"

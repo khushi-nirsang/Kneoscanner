@@ -1,0 +1,59 @@
+id: insecure-dependencies
+
+info:
+  name: Vulnerable & Outdated Dependencies
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Detects outdated and vulnerable framework/library versions
+    through version detection in headers and responses.
+  tags:
+    - vulnerable-components
+    - dependencies
+    - a06:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/api"
+
+    matchers:
+
+      - type: word
+        part: header
+        words:
+          - "Apache/2.2"
+          - "Apache/2.0"
+          - "nginx/1.10"
+          - "nginx/1.11"
+          - "nginx/1.12"
+          - "nginx/1.13"
+          - "nginx/1.14"
+          - "nginx/1.15"
+          - "nginx/1.16"
+        condition: or
+
+      - type: regex
+        part: body
+        regex:
+          - "(?i)powered by.*php/5\\."
+          - "(?i)powered by.*php/7\\.[0-2]"
+          - "(?i)wordpress/[0-4]\\."
+          - "(?i)joomla/1\\."
+          - "(?i)drupal/6\\."
+          - "(?i)drupal/7\\."
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and
+
+    extractors:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)Server:\\s*([^\\r\\n]+)"
+          - "(?i)X-Powered-By:\\s*([^\\r\\n]+)"

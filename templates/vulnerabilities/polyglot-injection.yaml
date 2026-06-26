@@ -1,0 +1,38 @@
+id: polyglot-injection
+
+info:
+  name: Polyglot / Markup Injection
+  author: khushi-nirsang
+  severity: medium
+  description: |
+    Detects polyglot injections that work across multiple
+    contexts (JavaScript, HTML, SQL) by injecting context-agnostic payloads.
+  tags:
+    - polyglot
+    - injection
+    - a03:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/?input={{payload}}"
+      - "{{BaseURL}}/search?q={{payload}}"
+      - "{{BaseURL}}/api/search?keyword={{payload}}"
+
+    payloads:
+      - "payloads/polyglot/polyglot-injection-payloads.txt"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "{{payload}}"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and

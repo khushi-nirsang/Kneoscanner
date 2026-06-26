@@ -62,3 +62,36 @@ func TestValidateTemplateRejectsRequestWithoutMatchers(t *testing.T) {
 		t.Fatal("expected validation error")
 	}
 }
+
+func TestValidateTemplateRejectsInvalidQualityMetadata(t *testing.T) {
+	base := Template{ID: "quality", Info: Info{Name: "Quality", Severity: "medium"}, Requests: []Request{{Method: "GET", Path: []string{"{{BaseURL}}"}, Matchers: []Matcher{{Type: "status", Status: []int{200}}}}}}
+	base.Info.Confidence = "certain"
+	if err := ValidateTemplate(base); err == nil {
+		t.Fatal("expected invalid confidence to be rejected")
+	}
+	base.Info.Confidence = "firm"
+	base.Info.CVSSScore = 10.1
+	if err := ValidateTemplate(base); err == nil {
+		t.Fatal("expected invalid CVSS score to be rejected")
+	}
+	base.Info.CVSSScore = 0
+	base.Info.Risk = "unsafe"
+	if err := ValidateTemplate(base); err == nil {
+		t.Fatal("expected invalid risk to be rejected")
+	}
+}
+
+func TestValidateTemplateRejectsInvalidRegex(t *testing.T) {
+	tmpl := Template{
+		ID:   "broken-regex",
+		Info: Info{Name: "Broken", Severity: "low"},
+		Requests: []Request{{
+			Method:   "GET",
+			Path:     []string{"{{BaseURL}}"},
+			Matchers: []Matcher{{Type: "regex", Regex: []string{"("}}},
+		}},
+	}
+	if err := ValidateTemplate(tmpl); err == nil {
+		t.Fatal("expected invalid regex to be rejected before scanning")
+	}
+}

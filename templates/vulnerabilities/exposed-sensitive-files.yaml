@@ -1,0 +1,29 @@
+id: exposed-sensitive-files
+
+info:
+  name: Exposed Sensitive File
+  author: neoscanner
+  severity: high
+  description: Detects directly accessible repository metadata or environment configuration evidence.
+  tags:
+    - sensitive-files
+    - misconfiguration
+    - a05:2021
+    - a6:2017
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.git/HEAD"
+      - "{{BaseURL}}/.env"
+      - "{{BaseURL}}/.env.production"
+    matchers:
+      - type: regex
+        part: body
+        regex:
+          - "(?m)^ref: refs/"
+          - "(?m)^(APP_KEY|DATABASE_URL|DB_PASSWORD|SECRET_KEY|AWS_SECRET_ACCESS_KEY)="
+      - type: status
+        status:
+          - 200
+    matchers-condition: and

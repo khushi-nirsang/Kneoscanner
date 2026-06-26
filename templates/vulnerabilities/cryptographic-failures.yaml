@@ -1,0 +1,41 @@
+id: cryptographic-failures
+
+info:
+  name: Cryptographic Failures
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Detects cryptographic failures including weak encryption,
+    exposed keys, and insecure cryptographic implementations.
+  tags:
+    - crypto
+    - cryptographic-failures
+    - a02:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/"
+
+    matchers:
+
+      - type: regex
+        part: body
+        regex:
+          - "(?i)-----BEGIN (RSA )?PRIVATE KEY-----"
+          - "(?i)-----BEGIN CERTIFICATE-----"
+          - "(?i)-----BEGIN EC PRIVATE KEY-----"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and
+
+    extractors:
+      - type: regex
+        part: body
+        regex:
+          - "-----BEGIN (RSA )?PRIVATE KEY-----[^-]+-----END (RSA )?PRIVATE KEY-----"

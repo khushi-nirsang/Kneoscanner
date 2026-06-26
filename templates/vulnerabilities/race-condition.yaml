@@ -1,0 +1,43 @@
+id: race-condition
+
+info:
+  name: Race Condition Detection
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Detects potential race conditions in critical operations
+    by testing concurrent access to sensitive resources.
+  tags:
+    - race-condition
+    - integrity-failures
+    - a08:2021
+
+requests:
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/api/withdraw"
+      - "{{BaseURL}}/api/transfer"
+      - "{{BaseURL}}/api/purchase"
+
+    headers:
+      Content-Type: application/json
+
+    body: '{"amount":"1000"}'
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "success"
+          - "transaction"
+          - "completed"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+          - 201
+
+    matchers-condition: and

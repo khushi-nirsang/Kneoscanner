@@ -1,0 +1,83 @@
+id: insecure-deserialization
+
+info:
+  name: Insecure Deserialization
+  author: khushi-nirsang
+  severity: critical
+  description: |
+    Detects insecure deserialization vulnerabilities in
+    Java, PHP, Python, and other serialized object handling.
+  tags:
+    - deserialization
+    - integrity-failures
+    - a08:2021
+
+requests:
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/api/user/update"
+      - "{{BaseURL}}/profile/save"
+      - "{{BaseURL}}/data/process"
+
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+
+    body: "data={{payload}}"
+
+    payloads:
+      - "payloads/deserialization/java-serialization.txt"
+      - "payloads/deserialization/php-serialization.txt"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "rO0AB"
+          - "serialVersionUID"
+          - "java.lang"
+          - "O:"
+          - "s:"
+          - "Exception"
+        condition: or
+
+      - type: regex
+        part: body
+        regex:
+          - "(?i)gadget"
+          - "(?i)exploit"
+          - "(?i)serialization.*error"
+
+      - type: status
+        status:
+          - 200
+          - 500
+
+    matchers-condition: and
+
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/api/callback"
+
+    headers:
+      Content-Type: application/json
+
+    body: '{"data":"{{payload}}"}'
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "error"
+          - "exception"
+        condition: or
+
+      - type: status
+        status:
+          - 500
+          - 502
+
+    matchers-condition: and

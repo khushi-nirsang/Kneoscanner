@@ -1,0 +1,75 @@
+id: command-injection
+
+info:
+  name: OS Command Injection
+  author: khushi-nirsang
+  severity: critical
+  description: |
+    Detects OS command injection vulnerabilities by injecting
+    shell metacharacters and commands to test if they are executed.
+    Tests for command execution through time-based detection.
+  tags:
+    - command-injection
+    - injection
+    - a03:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/?cmd={{payload}}"
+      - "{{BaseURL}}/?execute={{payload}}"
+      - "{{BaseURL}}/?input={{payload}}"
+      - "{{BaseURL}}/ping?host={{payload}}"
+      - "{{BaseURL}}/execute?command={{payload}}"
+
+    payloads:
+      - "payloads/command-injection/command-injection-payloads.txt"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "PONG"
+          - "packets transmitted"
+          - "bytes received"
+          - "root:"
+          - "bin/bash"
+          - "bin/sh"
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and
+
+  - method: POST
+
+    path:
+      - "{{BaseURL}}/upload"
+      - "{{BaseURL}}/process"
+      - "{{BaseURL}}/api/execute"
+
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+
+    body: "input={{payload}}"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "PONG"
+          - "packets transmitted"
+          - "uid="
+          - "gid="
+        condition: or
+
+      - type: status
+        status:
+          - 200
+
+    matchers-condition: and

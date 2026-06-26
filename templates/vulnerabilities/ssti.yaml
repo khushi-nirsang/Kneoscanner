@@ -7,6 +7,10 @@ info:
   description: |
     Detects possible Server Side Template Injection by injecting
     template expressions and checking whether they are evaluated.
+  tags:
+    - ssti
+    - injection
+    - a03:2021
 
 requests:
   - method: GET

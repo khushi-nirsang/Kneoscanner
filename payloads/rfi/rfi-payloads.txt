@@ -1,0 +1,9 @@
+http://attacker.com/shell.php
+http://evil.com/malware.php
+http://example.com/index.php?page=
+//attacker.com/shell.php
+\\\\attacker.com\\shell.php
+ftp://attacker.com/shell.php
+http://localhost/admin.php
+http://127.0.0.1/admin
+http://192.168.1.1/admin

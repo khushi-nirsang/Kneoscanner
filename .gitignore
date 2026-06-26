@@ -1,0 +1,24 @@
+# Build outputs
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+dist/
+build/
+tmp/
+
+# Runtime scan artifacts
+reports/
+scan_output*.txt
+*.sarif
+
+# Local editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Go workspace/cache helpers
+coverage.out
+*.prof

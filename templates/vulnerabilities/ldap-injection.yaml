@@ -1,0 +1,55 @@
+id: ldap-injection
+
+info:
+  name: LDAP Injection
+  author: khushi-nirsang
+  severity: high
+  description: |
+    Detects LDAP injection vulnerabilities by injecting
+    LDAP filter metacharacters and analyzing responses
+    for LDAP error messages or behavior differences.
+  tags:
+    - ldap-injection
+    - injection
+    - a03:2021
+
+requests:
+  - method: GET
+
+    path:
+      - "{{BaseURL}}/?username={{payload}}"
+      - "{{BaseURL}}/?user={{payload}}"
+      - "{{BaseURL}}/search?q={{payload}}"
+      - "{{BaseURL}}/ldap?filter={{payload}}"
+
+    payloads:
+      - "payloads/ldap-injection/ldap-injection-payloads.txt"
+
+    matchers:
+
+      - type: word
+        part: body
+        words:
+          - "ldap"
+          - "LDAP"
+          - "ldap_"
+          - "objectClass"
+          - "distinguishedName"
+          - "uid="
+          - "cn="
+        condition: or
+
+      - type: regex
+        part: body
+        regex:
+          - "(?i)ldap.*error"
+          - "(?i)search result"
+          - "(?i)no such object"
+          - "(?i)invalid filter"
+
+      - type: status
+        status:
+          - 200
+          - 500
+
+    matchers-condition: and
