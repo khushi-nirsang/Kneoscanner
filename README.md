@@ -15,7 +15,7 @@ JSON, HTML, PDF, and SARIF reports.
 
 ## Install From Git Clone
 
-```bash
+```text
 git clone https://github.com/khushi-nirsang/Kneoscanner.git
 cd Kneoscanner
 go mod download
@@ -24,7 +24,7 @@ go build -o kneoscanner .
 
 On Windows PowerShell:
 
-```powershell
+```text
 git clone https://github.com/khushi-nirsang/Kneoscanner.git
 cd Kneoscanner
 go mod download
