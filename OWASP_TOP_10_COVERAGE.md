@@ -65,7 +65,9 @@ templates, and authorized active mutation checks for OWASP Top 10 2021 classes.
 
 ## Template Groups
 
-Kneoscanner currently ships 36 vulnerability templates:
+Kneoscanner ships a focused set of OWASP vulnerability templates. The priority
+is to keep the existing templates strong and useful instead of filling the repo
+with duplicate or low-value files:
 
 - Injection: SQLi, XSS, command injection, LDAP, SSTI, XXE, header injection,
   RFI, LFI, path traversal, polyglot, error-based injection, SSRF.
@@ -74,9 +76,9 @@ Kneoscanner currently ships 36 vulnerability templates:
 - Authentication: authentication bypass, weak authentication, no rate limiting,
   CSRF.
 - Data protection: sensitive data exposure, cryptographic failures, exposed
-  sensitive files, JWT token exposure.
-- Misconfiguration: API documentation exposure, GraphQL exposure, debug endpoint
-  exposure, backup/config exposure, directory listing, CORS misconfiguration.
+  sensitive files.
+- Misconfiguration: missing security headers, weak CSP, permissive CORS,
+  version disclosure, and exposed sensitive files.
 - Integrity and components: insecure deserialization, insecure dependencies,
   race condition.
 

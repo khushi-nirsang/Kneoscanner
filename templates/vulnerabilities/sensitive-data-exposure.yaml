@@ -19,7 +19,15 @@ requests:
     path:
       - "{{BaseURL}}/api/user"
       - "{{BaseURL}}/api/config"
+      - "{{BaseURL}}/api/settings"
+      - "{{BaseURL}}/api/profile"
+      - "{{BaseURL}}/api/session"
+      - "{{BaseURL}}/config"
+      - "{{BaseURL}}/settings"
       - "{{BaseURL}}/debug"
+      - "{{BaseURL}}/debug/vars"
+      - "{{BaseURL}}/actuator/env"
+      - "{{BaseURL}}/actuator/configprops"
       - "{{BaseURL}}/error"
       - "{{BaseURL}}/"
 
@@ -32,10 +40,19 @@ requests:
           - "(?i)(password|passwd|pwd)[\\s]*[=:][\\s]*['\"]([^'\"]{1,})['\"]"
           - "(?i)(secret|secret_key|sk_live)[\\s]*[=:][\\s]*['\"]?([a-zA-Z0-9\\-_.]{20,})['\"]?"
           - "(?i)(token|access_token|auth_token)[\\s]*[=:][\\s]*['\"]?([a-zA-Z0-9\\-_.]{20,})['\"]?"
+          - "(?i)eyJ[a-zA-Z0-9_-]{10,}\\.[a-zA-Z0-9_-]{10,}\\.[a-zA-Z0-9_-]{10,}"
           - "(?i)(private_key|private.key)[\\s]*[=:][\\s]*['\"]([^'\"]{20,})['\"]"
+          - "(?i)-----BEGIN (RSA |OPENSSH |EC )?PRIVATE KEY-----"
           - "(?i)aws_secret_access_key[\\s]*[=:]"
           - "(?i)database_password[\\s]*[=:][\\s]*['\"]([^'\"]{1,})['\"]"
           - "(?i)(aws_access_key_id|aws_secret_access_key)[\\s]*[=:]"
+          - "(?i)AKIA[0-9A-Z]{16}"
+          - "(?i)xox[baprs]-[0-9A-Za-z-]{20,}"
+          - "(?i)gh[pousr]_[A-Za-z0-9_]{36,}"
+          - "(?i)AIza[0-9A-Za-z\\-_]{35}"
+          - "(?i)mongodb(\\+srv)?://[^\\s'\"]+"
+          - "(?i)postgres(ql)?://[^\\s'\"]+"
+          - "(?i)mysql://[^\\s'\"]+"
         condition: or
 
       - type: status

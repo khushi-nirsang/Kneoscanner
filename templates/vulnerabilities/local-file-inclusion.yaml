@@ -17,24 +17,37 @@ requests:
 
     path:
       - "{{BaseURL}}/?file={{payload}}"
+      - "{{BaseURL}}/?path={{payload}}"
+      - "{{BaseURL}}/?page={{payload}}"
+      - "{{BaseURL}}/?template={{payload}}"
+      - "{{BaseURL}}/?include={{payload}}"
+      - "{{BaseURL}}/?lang={{payload}}"
+      - "{{BaseURL}}/?document={{payload}}"
+      - "{{BaseURL}}/?filename={{payload}}"
       - "{{BaseURL}}/page?id={{payload}}"
       - "{{BaseURL}}/load?document={{payload}}"
+      - "{{BaseURL}}/view?file={{payload}}"
+      - "{{BaseURL}}/download?file={{payload}}"
+      - "{{BaseURL}}/api/file?name={{payload}}"
 
     payloads:
       - "payloads/lfi/lfi-payloads.txt"
 
     matchers:
 
-      - type: word
+      - type: regex
         part: body
-        words:
-          - "root:x:"
-          - "bin/bash"
-          - "<?php"
-          - "<?xml"
-          - "apache"
-          - "nginx"
-        condition: or
+        regex:
+          - "(?i)root:x:0:0:"
+          - "(?i)daemon:x:"
+          - "(?i)bin/(bash|sh)"
+          - "(?i)<\\?php"
+          - "(?i)<\\?xml"
+          - "(?i)\\[boot loader\\]"
+          - "(?i)for 16-bit app support"
+          - "(?i)DB_PASSWORD"
+          - "(?i)DATABASE_URL"
+          - "(?i)BEGIN (RSA |OPENSSH |EC )?PRIVATE KEY"
 
       - type: status
         status:

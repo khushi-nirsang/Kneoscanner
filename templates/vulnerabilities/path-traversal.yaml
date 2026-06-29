@@ -18,34 +18,45 @@ requests:
 
     path:
       - "{{BaseURL}}/?file={{payload}}"
+      - "{{BaseURL}}/?path={{payload}}"
+      - "{{BaseURL}}/?page={{payload}}"
+      - "{{BaseURL}}/?template={{payload}}"
+      - "{{BaseURL}}/?include={{payload}}"
+      - "{{BaseURL}}/?document={{payload}}"
+      - "{{BaseURL}}/?filename={{payload}}"
       - "{{BaseURL}}/download?path={{payload}}"
+      - "{{BaseURL}}/download?file={{payload}}"
+      - "{{BaseURL}}/download?filename={{payload}}"
       - "{{BaseURL}}/view?doc={{payload}}"
+      - "{{BaseURL}}/view?file={{payload}}"
       - "{{BaseURL}}/get?id={{payload}}"
       - "{{BaseURL}}/read?filename={{payload}}"
+      - "{{BaseURL}}/file?name={{payload}}"
+      - "{{BaseURL}}/api/download?file={{payload}}"
 
     payloads:
       - "payloads/path-traversal/path-traversal-payloads.txt"
 
     matchers:
 
-      - type: word
-        part: body
-        words:
-          - "root:x:"
-          - "apache:"
-          - "nginx:"
-          - "Application/json"
-          - "<?php"
-          - "<?xml"
-        condition: or
-
       - type: regex
         part: body
         regex:
+          - "(?i)root:x:0:0:"
+          - "(?i)daemon:x:"
+          - "(?i)\\[boot loader\\]"
+          - "(?i)for 16-bit app support"
+          - "(?i)<\\?php"
+          - "(?i)<\\?xml"
+          - "(?i)DB_PASSWORD"
+          - "(?i)database_password"
+          - "(?i)DATABASE_URL"
           - "(?i)database_password"
           - "(?i)api_key"
           - "(?i)secret_key"
           - "(?i)mysql_password"
+          - "(?i)aws_secret_access_key"
+          - "(?i)BEGIN (RSA |OPENSSH |EC )?PRIVATE KEY"
 
       - type: status
         status:

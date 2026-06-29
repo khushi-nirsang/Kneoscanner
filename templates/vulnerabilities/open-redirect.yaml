@@ -18,6 +18,25 @@ requests:
 
     path:
       - "{{BaseURL}}/redirect?url={{payload}}"
+      - "{{BaseURL}}/redirect?next={{payload}}"
+      - "{{BaseURL}}/redirect?target={{payload}}"
+      - "{{BaseURL}}/redirect?return={{payload}}"
+      - "{{BaseURL}}/redirect?return_url={{payload}}"
+      - "{{BaseURL}}/redirect?redirect_uri={{payload}}"
+      - "{{BaseURL}}/login?next={{payload}}"
+      - "{{BaseURL}}/login?return={{payload}}"
+      - "{{BaseURL}}/logout?next={{payload}}"
+      - "{{BaseURL}}/callback?redirect_uri={{payload}}"
+      - "{{BaseURL}}/?url={{payload}}"
+      - "{{BaseURL}}/?next={{payload}}"
+      - "{{BaseURL}}/?redirect={{payload}}"
+      - "{{BaseURL}}/?redir={{payload}}"
+      - "{{BaseURL}}/?rurl={{payload}}"
+      - "{{BaseURL}}/?return={{payload}}"
+      - "{{BaseURL}}/?returnTo={{payload}}"
+      - "{{BaseURL}}/?return_to={{payload}}"
+      - "{{BaseURL}}/?continue={{payload}}"
+      - "{{BaseURL}}/?destination={{payload}}"
 
     payloads:
       - "payloads/open-redirect/open-redirect-payloads.txt"
@@ -28,7 +47,10 @@ requests:
         part: header
         regex:
           - "(?i)location:.*evil\\.com"
+          - "(?i)location:.*www\\.evil\\.com"
+          - "(?i)location:.*subdomain\\.evil\\.com"
           - "(?i)location:.*attacker\\.com"
+          - "(?i)location:.*google\\.com"
           - "(?i)location:.*burpcollaborator"
           - "(?i)location:.*interactsh"
           - "(?i)location:.*//"

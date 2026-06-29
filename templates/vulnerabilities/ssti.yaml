@@ -24,6 +24,14 @@ requests:
       - "{{BaseURL}}/?name={{payload}}"
       - "{{BaseURL}}/?message={{payload}}"
       - "{{BaseURL}}/?input={{payload}}"
+      - "{{BaseURL}}/?template={{payload}}"
+      - "{{BaseURL}}/?view={{payload}}"
+      - "{{BaseURL}}/?page={{payload}}"
+      - "{{BaseURL}}/?email={{payload}}"
+      - "{{BaseURL}}/?comment={{payload}}"
+      - "{{BaseURL}}/search?q={{payload}}"
+      - "{{BaseURL}}/render?template={{payload}}"
+      - "{{BaseURL}}/preview?name={{payload}}"
 
     matchers:
 

@@ -20,9 +20,20 @@ requests:
     path:
       - "{{BaseURL}}/?url={{payload}}"
       - "{{BaseURL}}/?dest={{payload}}"
+      - "{{BaseURL}}/?destination={{payload}}"
       - "{{BaseURL}}/?redirect={{payload}}"
+      - "{{BaseURL}}/?redirect_uri={{payload}}"
       - "{{BaseURL}}/?next={{payload}}"
       - "{{BaseURL}}/?target={{payload}}"
+      - "{{BaseURL}}/?uri={{payload}}"
+      - "{{BaseURL}}/?path={{payload}}"
+      - "{{BaseURL}}/?callback={{payload}}"
+      - "{{BaseURL}}/?webhook={{payload}}"
+      - "{{BaseURL}}/?feed={{payload}}"
+      - "{{BaseURL}}/fetch?url={{payload}}"
+      - "{{BaseURL}}/proxy?url={{payload}}"
+      - "{{BaseURL}}/preview?url={{payload}}"
+      - "{{BaseURL}}/api/fetch?url={{payload}}"
 
     matchers:
 
@@ -33,6 +44,10 @@ requests:
           - "instance-id"
           - "security-groups"
           - "local-hostname"
+          - "iam/security-credentials"
+          - "computeMetadata"
+          - "metadata.google.internal"
+          - "root:x:0:0:"
         condition: or
 
       - type: status

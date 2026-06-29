@@ -17,9 +17,22 @@ requests:
 
     path:
       - "{{BaseURL}}/?search={{payload}}"
+      - "{{BaseURL}}/?q={{payload}}"
+      - "{{BaseURL}}/?query={{payload}}"
+      - "{{BaseURL}}/?keyword={{payload}}"
+      - "{{BaseURL}}/?term={{payload}}"
+      - "{{BaseURL}}/?name={{payload}}"
+      - "{{BaseURL}}/?message={{payload}}"
+      - "{{BaseURL}}/?comment={{payload}}"
+      - "{{BaseURL}}/?input={{payload}}"
+      - "{{BaseURL}}/?redirect={{payload}}"
       - "{{BaseURL}}/search.jsp?query={{payload}}"
       - "{{BaseURL}}/search?query={{payload}}"
       - "{{BaseURL}}/search?q={{payload}}"
+      - "{{BaseURL}}/search?keyword={{payload}}"
+      - "{{BaseURL}}/results?q={{payload}}"
+      - "{{BaseURL}}/profile?name={{payload}}"
+      - "{{BaseURL}}/feedback?message={{payload}}"
 
     payloads:
       - "payloads/xss/xss-reflected-basic.txt"
@@ -34,5 +47,7 @@ requests:
       - type: status
         status:
           - 200
+          - 400
+          - 500
 
     matchers-condition: and
