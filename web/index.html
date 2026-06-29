@@ -20,6 +20,7 @@
         <button class="active" data-view="overview">Overview</button>
         <button data-view="scan">Scan setup</button>
         <button data-view="findings">Findings</button>
+        <button data-view="reporting">Reports</button>
         <button data-view="history">History</button>
         <button data-view="templates">Templates</button>
         <button data-view="config">Runtime config</button>
@@ -154,6 +155,51 @@
             <div class="empty">Select a finding to inspect evidence, remediation, and sanitized HTTP transcripts.</div>
           </aside>
         </div>
+      </section>
+
+      <section id="reporting" class="view">
+        <section class="card report-builder">
+          <div class="section-head">
+            <div>
+              <h3>Disclosure report builder</h3>
+              <p>Generate platform-ready vulnerability reports from validated scan findings.</p>
+            </div>
+            <div class="filters">
+              <select id="reportPlatform">
+                <option value="hackerone">HackerOne style</option>
+                <option value="bugcrowd">Bugcrowd style</option>
+                <option value="standard">Standard markdown</option>
+              </select>
+              <select id="reportFinding"></select>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div><label>Report title</label><input id="reportTitle" placeholder="Reflected XSS on /search"></div>
+            <div><label>Affected asset</label><input id="reportAsset" placeholder="https://example.com/search?q=..."></div>
+            <div><label>Weakness type</label><input id="reportWeakness" placeholder="CWE-79 Cross-Site Scripting"></div>
+            <div><label>Severity</label><select id="reportSeverity"><option>critical</option><option>high</option><option selected>medium</option><option>low</option><option>info</option></select></div>
+          </div>
+
+          <label>Summary</label>
+          <textarea id="reportSummary" rows="4" placeholder="Short, clear explanation of the vulnerability and affected behavior."></textarea>
+          <label>Steps to reproduce</label>
+          <textarea id="reportSteps" rows="7" placeholder="1. Open the affected endpoint..."></textarea>
+          <label>Impact</label>
+          <textarea id="reportImpact" rows="4" placeholder="Explain what an attacker can achieve."></textarea>
+          <label>Evidence</label>
+          <textarea id="reportEvidence" rows="7" placeholder="HTTP evidence, payload, parameter, response proof."></textarea>
+          <label>Recommended fix</label>
+          <textarea id="reportFix" rows="4" placeholder="Recommended remediation or mitigation."></textarea>
+
+          <div class="actions">
+            <button id="populateReport" class="secondary" type="button">Use selected finding</button>
+            <button id="generateReport" type="button">Generate report</button>
+            <button id="copyReport" class="secondary" type="button">Copy markdown</button>
+            <button id="downloadReport" class="secondary" type="button">Download markdown</button>
+          </div>
+          <pre id="reportMarkdown" class="report-output">Select a finding, then generate a HackerOne-style or Bugcrowd-style report.</pre>
+        </section>
       </section>
 
       <section id="history" class="view">

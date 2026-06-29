@@ -45,6 +45,23 @@ func TestStaticFrontendUsesEventDrivenStatusUpdates(t *testing.T) {
 	}
 }
 
+func TestStaticFrontendIncludesDisclosureReportBuilder(t *testing.T) {
+	htmlData, err := os.ReadFile(filepath.Join("..", "..", "web", "index.html"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	jsData, err := os.ReadFile(filepath.Join("..", "..", "web", "app.js"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	bundle := string(htmlData) + string(jsData)
+	for _, fragment := range []string{"Disclosure report builder", "HackerOne style", "Bugcrowd style", "reportMarkdown", "populateReportFromFinding", "disclosureMarkdown", "copyReport", "downloadReport"} {
+		if !strings.Contains(bundle, fragment) {
+			t.Fatalf("static frontend reporting workflow is missing %q", fragment)
+		}
+	}
+}
+
 func TestWorkspaceIncludesEvidenceWorkflow(t *testing.T) {
 	html := workspacePage()
 	for _, fragment := range []string{"severityFilter", "confidenceFilter", "reviewFilter", "reviewMetrics", "review-metric", "triageProgress", "Triage progress", "Critical unreviewed", "High unreviewed", "focusMissingNotes", "notes-badge", "annotateNoteBadges", "workspace", "position:sticky", "Select a finding to inspect evidence", "findingPageSize", "prevFindingPage", "nextFindingPage", "findingPageStatus", "neoscanner.findingPageSize", "densityToggle", "Dense mode", "neoscanner.density", "body.compact", "advancedPolicy", "Advanced scan policy", "Additional targets", "targetList", "targetCount", "targets:$('targetList')", "authHeader", "cookieHeader", "crawlEnabled", "crawlMaxDepth", "policyTuning", "Engine tuning", "timeoutSeconds", "retryDelay", "requestDelay", "maxRespBytes", "followRedirects", "verifySSL", "allowExternal", "discoverOpenAPI", "discoverSitemap", "discoverScripts", "activeParamTesting", "activePostTesting", "Export policy JSON", "Import policy JSON", "collectPolicy", "applyPolicy", "neoscanner-policy.json", "configPanel", "/api/config", "Refresh config", "Transport", "Active coverage", "templatePanel", "/api/templates", "Template inventory", "templateSearch", "templateSeverity", "templateStatus", "Refresh templates", "filterChips", "renderFilterChips", "Scan preset", "Passive recon", "Safe web app scan", "Active parameter testing", "Intrusive lab validation", "applyPreset", "saveScanSettings", "restoreScanSettings", "neoscanner.scanSettings", "collapse", "setPanelCollapsed", "neoscanner.panel.", "scanPanel", "historyPanel", "Shortcuts:", "moveFinding", "typingTarget", "selected-row", "scrollIntoView", "Unreviewed only", "False positives", "Has analyst notes", "Missing analyst notes", "has_notes", "missing_notes", "Verification evidence", "Baseline", "Copy cURL", "request", "response", "Reset filters", "Technologies", "Scanning for", "Copied", "Escape", "Filter findings by", "syncAuthorization", "Confirm authorization before starting", "Scan history", "/api/history", "Refresh history", "/api/reviews", "/api/reviews/update", "Analyst notes", "analyst_notes", "findingNotes", "notesState", "notesUpdated", "reviewUpdatedText", "Last updated", "Not saved yet", "Unsaved changes", "Saving…", "Save failed", "hasUnsavedNotes", "beforeunload", "notesSaveTimer", "setTimeout(()=>saveFindingNotes(f),1200)", "detailEditing", "ctrlKey", "metaKey", "Save notes", "saveFindingNotes", "copyEvidencePane", "Copy pane", "evidenceBundle", "Copy evidence bundle", "Copied full evidence bundle", "Copied '+id+' evidence pane", "Copy finding ID", "Copy finding link", "#finding=", "openHashFinding", "hashchange", "Copy issue template", "issueMarkdown", "## Analyst notes", "## Remediation", "## Evidence", "Copy JSON", "Download JSON", "Open affected URL", "Mark reviewed", "Mark false positive", "Clear review", "bulkActions", "Select visible", "Mark selected reviewed", "Export selected JSON", "Export visible JSON", "Export visible CSV", "Copy visible summary", "visibleMarkdown", "KneoScanner visible findings summary", "review_status", "selectedFindings"} {

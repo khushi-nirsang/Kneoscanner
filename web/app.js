@@ -1,6 +1,6 @@
 const $ = id => document.getElementById(id);
 const rank = { critical: 5, high: 4, medium: 3, low: 2, info: 1 };
-const state = { findings: [], reports: [], events: [], aiAnalysis: null, reviews: {}, selected: null, selectedKeys: new Set(), activePane: 'summary', templates: [], lastStatusSignature: '', refreshTimer: null, eventSource: null };
+const state = { findings: [], reports: [], events: [], aiAnalysis: null, reviews: {}, selected: null, selectedKeys: new Set(), activePane: 'summary', templates: [], lastStatusSignature: '', refreshTimer: null, eventSource: null, reportFindingKey: '' };
 
 function esc(value){ const d=document.createElement('div'); d.textContent=value ?? ''; return d.innerHTML; }
 function isURL(value){ return /^https?:\/\//i.test(value || ''); }
@@ -15,6 +15,7 @@ const views = {
   overview: ['Overview','Command center for scan status, triage, and reports.'],
   scan: ['Scan setup','Targets, profile, authorization, and scan policy.'],
   findings: ['Findings','Analyst queue with evidence, triage state, notes, and exports.'],
+  reporting: ['Reports','HackerOne-style and Bugcrowd-style disclosure report builder.'],
   history: ['History','Recent scan runs and generated report artifacts.'],
   templates: ['Template inventory','Template health, severity, tags, CWE/CVE, and validation state.'],
   config: ['Runtime config','Current scanner configuration loaded by the GUI.']
@@ -91,6 +92,93 @@ function transcript(t, kind){
 }
 function curl(f){ const r=f.request||{}, h=r.headers||{}; let out=`curl -i -X ${r.method||f.method||'GET'} ${JSON.stringify(r.url||f.matched_url||'')}`; Object.keys(h).forEach(k=>out+=` -H ${JSON.stringify(k+': '+h[k].join(', '))}`); if(r.body) out+=` --data-raw ${JSON.stringify(r.body)}`; return out; }
 
+function selectedReportFinding(){
+  const key=state.reportFindingKey || (state.selected?reviewKey(state.selected):'');
+  return state.findings.find(f=>reviewKey(f)===key) || state.selected || state.findings[0] || null;
+}
+function cweFromTemplate(f){
+  const id=(f.template_id||'').toLowerCase();
+  if(id.includes('xss')) return 'CWE-79 Cross-Site Scripting';
+  if(id.includes('sql')) return 'CWE-89 SQL Injection';
+  if(id.includes('ssrf')) return 'CWE-918 Server-Side Request Forgery';
+  if(id.includes('redirect')) return 'CWE-601 Open Redirect';
+  if(id.includes('traversal')||id.includes('file-inclusion')) return 'CWE-22 Path Traversal';
+  if(id.includes('csrf')) return 'CWE-352 Cross-Site Request Forgery';
+  if(id.includes('command')) return 'CWE-78 OS Command Injection';
+  return '';
+}
+function reportCWE(f){ return (f.cwe||[]).join(', ') || cweFromTemplate(f) || 'Not mapped'; }
+function impactFor(f){
+  const id=(f.template_id||f.name||'').toLowerCase();
+  if(id.includes('xss')) return 'An attacker may execute JavaScript in a victim browser, steal session context, or perform actions as the victim.';
+  if(id.includes('sql')) return 'An attacker may read or modify database records depending on the vulnerable query and database permissions.';
+  if(id.includes('ssrf')) return 'An attacker may force the server to access internal services, cloud metadata, or restricted network resources.';
+  if(id.includes('redirect')) return 'An attacker may redirect users to a malicious site and increase phishing or account-takeover risk.';
+  if(id.includes('traversal')||id.includes('file')) return 'An attacker may read files outside the intended directory and expose secrets or source code.';
+  return 'The impact depends on exposed data, affected user roles, and the reachable application behavior.';
+}
+function reportStepsFor(f){
+  const lines=['1. Navigate to the affected asset: '+(f.matched_url||f.target||'not recorded')];
+  if(f.parameter) lines.push('2. Send the payload to the `'+f.parameter+'` parameter.');
+  else lines.push('2. Send the captured request shown in the evidence section.');
+  if(f.payload) lines.push('3. Use payload: `'+f.payload+'`');
+  lines.push('4. Observe the response evidence that confirms the issue.');
+  return lines.join('\n');
+}
+function reportEvidenceFor(f){
+  const evidence=(f.evidence||[]).map(x=>'- '+x).join('\n')||'- Evidence was captured by Kneoscanner.';
+  const request=f.request&&f.request.url?'\n\nRequest URL:\n`'+f.request.url+'`':'';
+  const status=f.status_code?'\n\nHTTP status: '+f.status_code:'';
+  const payload=f.payload?'\n\nPayload:\n`'+f.payload+'`':'';
+  return [evidence,request,status,payload].filter(Boolean).join('');
+}
+function renderReportFindingOptions(){
+  const select=$('reportFinding');
+  if(!select) return;
+  const current=state.reportFindingKey || (state.selected?reviewKey(state.selected):'');
+  select.innerHTML=state.findings.length?state.findings.map(f=>`<option value="${esc(reviewKey(f))}" ${reviewKey(f)===current?'selected':''}>${esc((f.severity||'').toUpperCase())} - ${esc(f.name||'Finding')} - ${esc(f.matched_url||'')}</option>`).join(''):'<option value="">No findings available</option>';
+}
+function populateReportFromFinding(f=selectedReportFinding()){
+  if(!f){ toast('Run a scan or select a finding first'); return; }
+  state.reportFindingKey=reviewKey(f);
+  $('reportTitle').value=(f.severity?f.severity.toUpperCase()+' - ':'')+(f.name||'Security finding');
+  $('reportAsset').value=f.matched_url||f.final_url||f.target||'';
+  $('reportWeakness').value=reportCWE(f);
+  $('reportSeverity').value=(f.severity||'medium').toLowerCase();
+  $('reportSummary').value=f.description||`${f.name||'A vulnerability'} was detected on the affected asset.`;
+  $('reportSteps').value=reportStepsFor(f);
+  $('reportImpact').value=f.impact||impactFor(f);
+  $('reportEvidence').value=reportEvidenceFor(f);
+  $('reportFix').value=f.remediation||'Validate the finding, patch the affected code path, and add a regression test.';
+  renderReportFindingOptions();
+  generateDisclosureReport();
+}
+function reportField(id){ return ($(id).value||'').trim(); }
+function disclosureMarkdown(){
+  const platform=$('reportPlatform').value;
+  const title=reportField('reportTitle')||'Security vulnerability report';
+  const asset=reportField('reportAsset')||'Not recorded';
+  const weakness=reportField('reportWeakness')||'Not mapped';
+  const severity=reportField('reportSeverity')||'medium';
+  const summary=reportField('reportSummary')||'No summary provided.';
+  const steps=reportField('reportSteps')||'No reproduction steps provided.';
+  const impact=reportField('reportImpact')||'Impact requires analyst validation.';
+  const evidence=reportField('reportEvidence')||'No evidence provided.';
+  const fix=reportField('reportFix')||'No fix guidance provided.';
+  const f=selectedReportFinding();
+  const references=f&&f.references&&f.references.length?f.references.map(x=>'- '+x).join('\n'):'- No external references recorded';
+  if(platform==='bugcrowd'){
+    return ['# '+title,'','## Summary',summary,'','## Target / Asset',asset,'','## Vulnerability Type',weakness,'','## Severity',severity,'','## Steps to Reproduce',steps,'','## Proof of Concept / Evidence',evidence,'','## Security Impact',impact,'','## Suggested Remediation',fix,'','## References',references].join('\n');
+  }
+  if(platform==='standard'){
+    return ['# '+title,'','**Severity:** '+severity,'**Weakness:** '+weakness,'**Affected asset:** '+asset,'','## Description',summary,'','## Reproduction',steps,'','## Evidence',evidence,'','## Impact',impact,'','## Remediation',fix,'','## References',references].join('\n');
+  }
+  return ['# '+title,'','## Summary',summary,'','## Affected Asset',asset,'','## Weakness',weakness,'','## Severity',severity,'','## Steps To Reproduce',steps,'','## Supporting Material / References',evidence+'\n\n'+references,'','## Impact',impact,'','## Recommended Remediation',fix].join('\n');
+}
+function generateDisclosureReport(){
+  $('reportMarkdown').textContent=disclosureMarkdown();
+}
+
 function showDetail(f){
   if(!f) return;
   state.selected=f;
@@ -138,6 +226,7 @@ function renderStatus(data){
   $('status').textContent=data.error?`Scan failed: ${data.error}`:data.running?`Scanning since ${new Date(data.started).toLocaleTimeString()}`:data.finished?`Scan completed at ${new Date(data.finished).toLocaleTimeString()} with ${state.findings.length} findings.`:'Ready.';
   $('activity').innerHTML=state.events.slice(-8).reverse().map(e=>`<div>${esc(new Date(e.timestamp).toLocaleTimeString())} · ${esc(e.message)}</div>`).join('');
   renderAll();
+  renderReportFindingOptions();
 }
 
 async function poll(){ try{ renderStatus(await (await fetch('/api/status')).json()); }catch(e){ $('status').textContent=`Connection error: ${e.message}`; } }
@@ -188,6 +277,7 @@ renderStatus=function(data){
   $('status').textContent=data.error?`Scan failed: ${data.error}`:data.running?`Scanning since ${new Date(data.started).toLocaleTimeString()}`:data.finished?`Scan completed at ${new Date(data.finished).toLocaleTimeString()} with ${state.findings.length} findings.`:'Ready.';
   $('activity').innerHTML=state.events.slice(-8).reverse().map(e=>`<div>${esc(new Date(e.timestamp).toLocaleTimeString())} · ${esc(e.message)}</div>`).join('');
   renderAll();
+  renderReportFindingOptions();
   if(selectedKey){
     requestAnimationFrame(()=>{
       const freshDetail=$('details');
@@ -238,11 +328,18 @@ function init(){
   $('exportSelected').onclick=()=>download('selected-findings.json', JSON.stringify(state.findings.filter(f=>state.selectedKeys.has(reviewKey(f))),null,2), 'application/json');
   $('exportVisibleCsv').onclick=()=>download('visible-findings.csv', csv(visibleFindings()), 'text/csv');
   $('refreshHistory').onclick=loadHistory; $('refreshTemplates').onclick=loadTemplates; $('refreshConfig').onclick=loadConfig;
+  $('reportFinding').onchange=()=>{ state.reportFindingKey=$('reportFinding').value; populateReportFromFinding(selectedReportFinding()); };
+  $('reportPlatform').onchange=generateDisclosureReport;
+  ['reportTitle','reportAsset','reportWeakness','reportSeverity','reportSummary','reportSteps','reportImpact','reportEvidence','reportFix'].forEach(id=>$(id).oninput=generateDisclosureReport);
+  $('populateReport').onclick=()=>populateReportFromFinding();
+  $('generateReport').onclick=generateDisclosureReport;
+  $('copyReport').onclick=()=>copy($('reportMarkdown').textContent||'');
+  $('downloadReport').onclick=()=>download('kneoscanner-disclosure-report.md', $('reportMarkdown').textContent||'', 'text/markdown');
   $('exportPolicy').onclick=()=>download('kneoscanner-policy.json', JSON.stringify(collectPolicy(),null,2), 'application/json');
   $('importPolicyButton').onclick=()=>$('importPolicyFile').click();
   $('importPolicyFile').onchange=async e=>{ const file=e.target.files[0]; if(file) applyPolicy(JSON.parse(await file.text())); };
   ['target','targetList'].forEach(id=>$(id).oninput=updateTargetCount);
-  restoreScanSettings(); activateView(localStorage.getItem('neoscanner.appView')||'overview'); updateTargetCount(); loadReviews(); loadHistory(); loadTemplates(); loadConfig(); poll(); connectEvents(); setInterval(poll, 15000);
+  restoreScanSettings(); activateView(localStorage.getItem('neoscanner.appView')||'overview'); updateTargetCount(); renderReportFindingOptions(); loadReviews(); loadHistory(); loadTemplates(); loadConfig(); poll(); connectEvents(); setInterval(poll, 15000);
 }
 function csv(items){ const cols=['severity','confidence','name','matched_url','method','parameter','template_id','remediation']; return cols.join(',')+'\n'+items.map(f=>cols.map(c=>`"${String(f[c]??'').replaceAll('"','""')}"`).join(',')).join('\n'); }
 init();
