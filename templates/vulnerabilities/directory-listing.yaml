@@ -1,0 +1,35 @@
+id: directory-listing
+
+info:
+  name: Directory Listing Enabled
+  author: khushi-nirsang
+  severity: medium
+  description: Detects directory indexes that can expose source files, backups, uploads, and sensitive application paths.
+  risk: safe
+  confidence: firm
+  tags:
+    - directory-listing
+    - security-misconfiguration
+    - a05:2021
+  remediation: Disable directory listing and ensure web roots only expose intended static assets.
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/uploads/"
+      - "{{BaseURL}}/files/"
+      - "{{BaseURL}}/backup/"
+      - "{{BaseURL}}/backups/"
+      - "{{BaseURL}}/logs/"
+      - "{{BaseURL}}/static/"
+    matchers:
+      - type: regex
+        part: body
+        regex:
+          - "(?i)<title>Index of /"
+          - "(?i)Index of /"
+          - "(?i)Parent Directory"
+      - type: status
+        status:
+          - 200
+    matchers-condition: and

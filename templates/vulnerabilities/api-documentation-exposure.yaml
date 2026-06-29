@@ -1,0 +1,41 @@
+id: api-documentation-exposure
+
+info:
+  name: Exposed API Documentation
+  author: khushi-nirsang
+  severity: medium
+  description: Detects exposed Swagger, OpenAPI, and API documentation interfaces that can reveal endpoints, schemas, and authentication flows.
+  risk: safe
+  confidence: firm
+  tags:
+    - security-misconfiguration
+    - api
+    - swagger
+    - a05:2021
+  remediation: Restrict API documentation to authenticated administrators or internal networks and remove it from production when not required.
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/swagger-ui/"
+      - "{{BaseURL}}/swagger-ui/index.html"
+      - "{{BaseURL}}/swagger/index.html"
+      - "{{BaseURL}}/api-docs"
+      - "{{BaseURL}}/api/docs"
+      - "{{BaseURL}}/docs"
+      - "{{BaseURL}}/redoc"
+      - "{{BaseURL}}/openapi.json"
+      - "{{BaseURL}}/swagger.json"
+    matchers:
+      - type: regex
+        part: body
+        regex:
+          - "(?i)swagger-ui"
+          - "(?i)openapi[\"']?\\s*[:=]\\s*[\"']?3\\."
+          - "(?i)\"swagger\"\\s*:\\s*\"2\\.0\""
+          - "(?i)redoc"
+          - "(?i)api documentation"
+      - type: status
+        status:
+          - 200
+    matchers-condition: and

@@ -1,0 +1,36 @@
+id: cors-misconfiguration
+
+info:
+  name: CORS Misconfiguration
+  author: khushi-nirsang
+  severity: medium
+  description: Detects permissive CORS headers that may expose API responses to untrusted origins.
+  risk: safe
+  confidence: firm
+  tags:
+    - cors
+    - security-misconfiguration
+    - a05:2021
+  remediation: Restrict Access-Control-Allow-Origin to trusted origins and avoid combining wildcard origins with credentials.
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/api"
+      - "{{BaseURL}}/api/user"
+    matchers:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)Access-Control-Allow-Origin:\\s*\\*"
+          - "(?i)Access-Control-Allow-Credentials:\\s*true"
+      - type: status
+        status:
+          - 200
+          - 204
+          - 301
+          - 302
+          - 401
+          - 403
+    matchers-condition: and

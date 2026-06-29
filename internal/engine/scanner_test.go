@@ -495,6 +495,10 @@ func TestTemplateRiskProfiles(t *testing.T) {
 
 func TestPassiveSecurityConfigurationFindings(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Security-Policy", "default-src *; script-src 'self' 'unsafe-inline'")
+		w.Header().Set("Server", "demo-server/1.0")
+		w.Header().Set("X-Powered-By", "DemoFramework")
 		http.SetCookie(w, &http.Cookie{Name: "sessionid", Value: "test"})
 		_, _ = w.Write([]byte("ok"))
 	}))
@@ -502,12 +506,19 @@ func TestPassiveSecurityConfigurationFindings(t *testing.T) {
 
 	scanner := NewScanner(1, 2)
 	scanner.scanSecurityConfiguration(server.URL)
-	if got := len(scanner.Results.Items); got != 5 {
-		t.Fatalf("expected four missing-header and one cookie finding, got %d", got)
+	if got := len(scanner.Results.Items); got != 9 {
+		t.Fatalf("expected missing headers, passive exposure, CORS, CSP, and cookie findings, got %d", got)
 	}
+	seen := map[string]bool{}
 	for _, finding := range scanner.Results.Items {
 		if finding.OWASPCategory == "" || finding.Confidence != "confirmed" {
 			t.Fatalf("expected OWASP category and confidence, got %#v", finding)
+		}
+		seen[finding.Name] = true
+	}
+	for _, name := range []string{"Permissive CORS Policy", "Weak Content Security Policy", "Server Version Disclosure", "X-Powered-By Disclosure", "Session Cookie Missing SameSite"} {
+		if !seen[name] {
+			t.Fatalf("expected passive finding %q, got %#v", name, seen)
 		}
 	}
 }

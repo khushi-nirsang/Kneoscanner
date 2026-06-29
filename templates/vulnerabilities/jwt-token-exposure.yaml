@@ -1,0 +1,34 @@
+id: jwt-token-exposure
+
+info:
+  name: JWT Token Exposure
+  author: khushi-nirsang
+  severity: high
+  description: Detects JWT-like tokens exposed in page source or API responses.
+  risk: safe
+  confidence: firm
+  tags:
+    - jwt
+    - sensitive-data
+    - cryptographic-failures
+    - a02:2021
+  remediation: Do not expose long-lived tokens in client-side code or unauthenticated responses. Rotate exposed tokens and use short-lived, scoped credentials.
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/config"
+      - "{{BaseURL}}/api/config"
+      - "{{BaseURL}}/api/user"
+      - "{{BaseURL}}/debug"
+    matchers:
+      - type: regex
+        part: body
+        regex:
+          - "eyJ[a-zA-Z0-9_-]{10,}\\.[a-zA-Z0-9_-]{10,}\\.[a-zA-Z0-9_-]{10,}"
+      - type: status
+        status:
+          - 200
+          - 500
+    matchers-condition: and

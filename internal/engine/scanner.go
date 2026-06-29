@@ -426,6 +426,26 @@ func (s *Scanner) scanSecurityConfiguration(target string) {
 			s.addPassiveFinding(target, resp, "security-misconfiguration", check.name, check.description, check.severity)
 		}
 	}
+	if server := strings.TrimSpace(resp.Header.Get("Server")); server != "" {
+		s.addPassiveFindingWithEvidence(target, resp, "security-misconfiguration", "Server Version Disclosure", "The response exposes server technology details that can help attackers fingerprint the stack.", "info", []string{"Server header is present: " + server})
+	}
+	if poweredBy := strings.TrimSpace(resp.Header.Get("X-Powered-By")); poweredBy != "" {
+		s.addPassiveFindingWithEvidence(target, resp, "security-misconfiguration", "X-Powered-By Disclosure", "The response exposes application framework details through X-Powered-By.", "info", []string{"X-Powered-By header is present: " + poweredBy})
+	}
+	if cors := strings.TrimSpace(resp.Header.Get("Access-Control-Allow-Origin")); cors == "*" {
+		severity := "medium"
+		evidence := []string{"Access-Control-Allow-Origin is wildcard (*)"}
+		if strings.EqualFold(strings.TrimSpace(resp.Header.Get("Access-Control-Allow-Credentials")), "true") {
+			severity = "high"
+			evidence = append(evidence, "Access-Control-Allow-Credentials is true")
+		}
+		s.addPassiveFindingWithEvidence(target, resp, "security-misconfiguration", "Permissive CORS Policy", "The response allows broad cross-origin access that may expose sensitive API data.", severity, evidence)
+	}
+	if csp := strings.ToLower(resp.Header.Get("Content-Security-Policy")); csp != "" {
+		if strings.Contains(csp, "unsafe-inline") || strings.Contains(csp, "unsafe-eval") || strings.Contains(csp, "default-src *") || strings.Contains(csp, "script-src *") {
+			s.addPassiveFindingWithEvidence(target, resp, "security-misconfiguration", "Weak Content Security Policy", "The Content-Security-Policy contains unsafe directives that reduce XSS protection.", "medium", []string{"Content-Security-Policy contains unsafe or wildcard directives"})
+		}
+	}
 	for _, cookie := range resp.Cookies() {
 		name := strings.ToLower(cookie.Name)
 		if !strings.Contains(name, "session") && !strings.Contains(name, "auth") && !strings.Contains(name, "token") && !strings.Contains(name, "sid") {
@@ -437,13 +457,24 @@ func (s *Scanner) scanSecurityConfiguration(target string) {
 		if strings.HasPrefix(strings.ToLower(target), "https://") && !cookie.Secure {
 			s.addPassiveFinding(target, resp, "cryptographic-failures", "Session Cookie Missing Secure", "Session-like cookie "+cookie.Name+" lacks the Secure flag over HTTPS.", "medium")
 		}
+		if cookie.SameSite <= http.SameSiteDefaultMode {
+			s.addPassiveFindingWithEvidence(target, resp, "identification-and-authentication-failures", "Session Cookie Missing SameSite", "Session-like cookie "+cookie.Name+" does not explicitly set a SameSite policy.", "low", []string{"session-like cookie lacks explicit SameSite attribute: " + cookie.Name})
+		}
 	}
 }
 
 func (s *Scanner) addPassiveFinding(target string, resp *utils.Response, category, name, description, severity string) {
 	evidence := []string{fmt.Sprintf("response status: %d", resp.StatusCode), "required protection header is absent"}
+	s.addPassiveFindingWithEvidence(target, resp, category, name, description, severity, evidence)
+}
+
+func (s *Scanner) addPassiveFindingWithEvidence(target string, resp *utils.Response, category, name, description, severity string, evidence []string) {
 	if s.Results.Add(ScanResult{Target: target, TemplateID: "passive-" + strings.ToLower(strings.ReplaceAll(name, " ", "-")), Name: name, Severity: severity, OWASPCategory: category, Confidence: "confirmed", Matched: true, Description: description, MatchedURL: target, FinalURL: resp.FinalURL, Method: http.MethodGet, StatusCode: resp.StatusCode, BodySize: resp.BodySize, Truncated: resp.Truncated, Attempts: resp.Attempts, Technologies: technologyFingerprint(resp), Evidence: evidence, Request: s.requestTranscript(http.MethodGet, target, "", resp), Response: s.transcript(http.MethodGet, target, "", resp)}) {
-		color.Red("[%s] %s (passive) -> %s (proof: required response header is absent)", strings.ToUpper(severity), name, target)
+		proof := "passive evidence captured"
+		if len(evidence) > 0 {
+			proof = evidence[0]
+		}
+		color.Red("[%s] %s (passive) -> %s (proof: %s)", strings.ToUpper(severity), name, target, proof)
 	}
 }
 

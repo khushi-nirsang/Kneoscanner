@@ -1,227 +1,107 @@
-# KNeoScanner - Comprehensive OWASP Top 10 Detection
+# Kneoscanner OWASP Top 10 Coverage
 
-## Overview
-KNeoScanner has been enhanced with comprehensive coverage for all OWASP Top 10 2021 vulnerabilities plus additional injection types and security issues.
+Kneoscanner includes safe passive checks, same-origin discovery, YAML-based
+templates, and authorized active mutation checks for OWASP Top 10 2021 classes.
 
-## OWASP Top 10 2021 Coverage Matrix
+## Coverage Matrix
 
 ### A01:2021 - Broken Access Control
-- ✅ Insecure Direct Object Reference (IDOR) Detection
-- ✅ Path Traversal / Directory Traversal
-- ✅ Broken Access Control
-- ✅ Privilege Escalation
-- ✅ Local File Inclusion (LFI)
-- ✅ Open Redirect
-- ✅ Mass Assignment / Parameter Pollution
+- IDOR probes
+- Path traversal and local file inclusion checks
+- Broken access control and privilege escalation templates
+- Open redirect detection
+- Mass assignment and parameter pollution checks
 
 ### A02:2021 - Cryptographic Failures
-- ✅ Cryptographic Failures Detection
-- ✅ Sensitive Data Exposure (API Keys, Tokens, Passwords)
-- ✅ Exposed Sensitive Files (.env, .git, credentials)
+- Sensitive data exposure patterns
+- Exposed key, token, credential, and backup file checks
+- HTTPS cookie `Secure` flag checks
 
 ### A03:2021 - Injection
-- ✅ SQL Injection (Error-based, Time-based, Union-based)
-- ✅ OS Command Injection
-- ✅ Cross-Site Scripting (XSS) - Reflected
-- ✅ LDAP Injection
-- ✅ Server-Side Template Injection (SSTI)
-- ✅ Advanced SSTI (Jinja2, Mako, Velocity)
-- ✅ XML External Entity (XXE) Injection
-- ✅ HTTP Header Injection
-- ✅ Remote File Inclusion (RFI)
-- ✅ Polyglot / Markup Injection
-- ✅ Error-Based Injection Detection
+- SQL injection
+- Reflected XSS
+- OS command injection
+- LDAP injection
+- SSTI and advanced SSTI
+- XXE probes
+- Header injection
+- RFI/LFI/path traversal
+- Error-based and polyglot injection checks
 
 ### A04:2021 - Insecure Design
-- ✅ CSRF Detection
-- ✅ Authentication Bypass
-- ✅ Race Condition Detection
-- ✅ Missing Rate Limiting
+- CSRF checks on discovered POST forms
+- Authentication bypass probes
+- Race condition templates
+- Missing rate limiting checks
 
 ### A05:2021 - Security Misconfiguration
-- ✅ Exposed Sensitive Files
-- ✅ Missing Security Headers (CSP, X-Frame-Options, etc.)
-- ✅ Session Cookie Security (HttpOnly, Secure flags)
-- ✅ SSL/TLS Misconfiguration
+- Missing security headers
+- Weak Content Security Policy detection
+- Permissive CORS detection
+- Server and framework version disclosure checks
+- Exposed Swagger/OpenAPI/GraphQL/debug endpoints
+- Directory listing and backup/config file exposure
 
-### A06:2021 - Vulnerable & Outdated Components
-- ✅ Insecure Dependencies Detection
-- ✅ Outdated Framework/Library Version Detection
+### A06:2021 - Vulnerable and Outdated Components
+- Insecure dependency and exposed framework signal checks
 
-### A07:2021 - Identification & Authentication Failures
-- ✅ Authentication Bypass
-- ✅ Weak Authentication & Default Credentials
-- ✅ Missing Rate Limiting
-- ✅ Session Management Issues
+### A07:2021 - Identification and Authentication Failures
+- Weak/default credential probes
+- Authentication bypass checks
+- Session cookie `HttpOnly`, `Secure`, and `SameSite` checks
 
-### A08:2021 - Software & Data Integrity Failures
-- ✅ Insecure Deserialization (Java, PHP)
-- ✅ Race Condition Detection
+### A08:2021 - Software and Data Integrity Failures
+- Insecure deserialization templates
+- Backup and configuration exposure checks
 
-### A09:2021 - Logging & Monitoring Failures
-- ⚠️ Limited (Application-dependent logging)
+### A09:2021 - Security Logging and Monitoring Failures
+- Limited direct detection because logging behavior is application-dependent.
+  Findings from exposed debug, metrics, and admin surfaces help triage this
+  category during review.
 
-### A10:2021 - Server-Side Request Forgery (SSRF)
-- ✅ SSRF Detection using external payload files
+### A10:2021 - Server-Side Request Forgery
+- SSRF probes with external payload files
+- URL parameter mutation during authorized active scans
 
-## Template Directory
+## Template Groups
 
-### Core Injection Templates (15 templates)
-1. **sql-injection.yaml** - SQL Injection variants
-2. **xss.yaml** - Reflected XSS
-3. **command-injection.yaml** - OS Command Injection
-4. **ldap-injection.yaml** - LDAP Injection
-5. **ssti.yaml** - Basic SSTI
-6. **ssti-advanced.yaml** - Advanced SSTI (Jinja2, Mako, Velocity)
-7. **xxe-probe.yaml** - XXE Injection
-8. **header-injection.yaml** - HTTP Header Injection
-9. **remote-file-inclusion.yaml** - RFI
-10. **local-file-inclusion.yaml** - LFI
-11. **polyglot-injection.yaml** - Polyglot Injection
-12. **error-based-injection.yaml** - Error-Based Injection
-13. **ssrf-probe.yaml** - SSRF
-14. **path-traversal.yaml** - Path Traversal
+Kneoscanner currently ships 36 vulnerability templates:
 
-### Access Control Templates (5 templates)
-1. **idor.yaml** - IDOR Detection
-2. **broken-access-control.yaml** - Broken Access Control
-3. **privilege-escalation.yaml** - Privilege Escalation
-4. **mass-assignment.yaml** - Mass Assignment
-5. **open-redirect.yaml** - Open Redirect
+- Injection: SQLi, XSS, command injection, LDAP, SSTI, XXE, header injection,
+  RFI, LFI, path traversal, polyglot, error-based injection, SSRF.
+- Access control: IDOR, broken access control, privilege escalation, mass
+  assignment, open redirect.
+- Authentication: authentication bypass, weak authentication, no rate limiting,
+  CSRF.
+- Data protection: sensitive data exposure, cryptographic failures, exposed
+  sensitive files, JWT token exposure.
+- Misconfiguration: API documentation exposure, GraphQL exposure, debug endpoint
+  exposure, backup/config exposure, directory listing, CORS misconfiguration.
+- Integrity and components: insecure deserialization, insecure dependencies,
+  race condition.
 
-### Authentication & Authorization (4 templates)
-1. **authentication-bypass.yaml** - Auth Bypass
-2. **weak-authentication.yaml** - Weak Auth & Default Credentials
-3. **no-rate-limiting.yaml** - Missing Rate Limiting
-4. **csrf.yaml** - CSRF Detection
+## Recommended Usage
 
-### Data Protection (3 templates)
-1. **sensitive-data-exposure.yaml** - Sensitive Data Exposure
-2. **cryptographic-failures.yaml** - Cryptographic Failures
-3. **exposed-sensitive-files.yaml** - Exposed Config Files
-
-### Components & Configuration (2 templates)
-1. **insecure-dependencies.yaml** - Vulnerable Components
-2. **insecure-deserialization.yaml** - Deserialization Vulnerabilities
-
-### Design & Concurrency (1 template)
-1. **race-condition.yaml** - Race Conditions
-
-## Payload Files
-
-### Located in: `payloads/`
-
-- **command-injection/** - OS command injection payloads
-- **path-traversal/** - Directory traversal sequences
-- **ldap-injection/** - LDAP filter injection payloads
-- **weak-auth/** - Default credentials and weak auth attempts
-- **deserialization/** - Java and PHP serialization gadget chains
-- **header-injection/** - CRLF injection payloads
-- **polyglot/** - Polyglot injection payloads
-- **xss/** - XSS reflected payloads (existing)
-- **sqli/** - SQL injection payloads (existing)
-- **ssti/** - SSTI payloads (existing)
-- **rfi/** - Remote file inclusion payloads
-- **lfi/** - Local file inclusion payloads
-- **error-injection/** - Error-based injection payloads
-- **xxe/** - XXE payloads (existing, enhanced)
-- **ssrf/** - SSRF payloads (existing)
-- **idor/** - IDOR payloads (existing)
-- **open-redirect/** - Open redirect payloads (existing)
-
-## Usage Examples
-
-### Scan with all OWASP Top 10 templates
-```bash
-./neoscanner -u http://target.com --threads 50
+```text
+./kneoscanner -u https://example.com --profile active --acknowledge-authorization
 ```
 
-### Scan specific vulnerabilities with parameter testing
-```bash
-./neoscanner -u http://target.com --parameter id,name,email --threads 50
+Focus on likely input names when discovery needs help:
+
+```text
+./kneoscanner -u https://example.com --profile active --acknowledge-authorization --parameter id,q,search,url,redirect,next,file
 ```
 
-### Scan with verbose output
-```bash
-./neoscanner -u http://target.com -o results.json --threads 50
+Use `intrusive` only on systems where you have explicit permission to run
+higher-risk mutation checks:
+
+```text
+./kneoscanner -u https://example.com --profile intrusive --acknowledge-authorization
 ```
 
-### Scan multiple targets
-```bash
-./neoscanner -l targets.txt --threads 50
-```
+## Notes
 
-## Configuration
-
-Edit `config.yaml` to customize:
-- Number of threads
-- HTTP timeout
-- Redirect handling
-- TLS verification
-- Crawling settings
-- Active parameter testing
-- POST form testing
-
-## Key Features
-
-1. **Comprehensive Coverage**: 29 vulnerability templates covering all OWASP Top 10
-2. **Accurate Detection**: Regex and pattern-based matchers for low false positives
-3. **Flexible Payloads**: Extensive payload files for each vulnerability type
-4. **Discovery Integration**: Automatic parameter discovery and active testing
-5. **Session Management**: Cookie-aware HTTP client
-6. **Detailed Reporting**: JSON and HTML reports with evidence
-
-## Enhanced Payloads
-
-Each template includes carefully crafted payloads to detect vulnerabilities:
-
-- **SQL Injection**: Error-based, Time-based, Union-based, Blind SQLi
-- **Command Injection**: Shell metacharacters, command substitution, time-based
-- **XSS**: Reflective payload detection
-- **SSTI**: Template engine expressions for multiple frameworks
-- **Path Traversal**: Directory traversal sequences and URL encoding bypasses
-- **LDAP**: Filter injection with wildcard and OR conditions
-- **XXE**: Entity declaration and file disclosure payloads
-- **Deserialization**: Gadget chain and serialization format detection
-
-## Recommendations
-
-1. Run comprehensive scans on staging environments first
-2. Use parameter discovery (`--parameter`) to test specific inputs
-3. Review results carefully as some may require context validation
-4. Check HTML reports for detailed evidence
-5. Use thread count based on target capacity (default: 25, max recommended: 100)
-6. Enable crawling for comprehensive discovery
-7. Test against known vulnerable applications first
-
-## Supported Vulnerability Categories
-
-- Injection Attacks (13 types)
-- Broken Access Control (7 types)
-- Cryptographic Issues (2 types)
-- Weak Authentication (3 types)
-- Misconfiguration (3 types)
-- Vulnerable Dependencies (1 type)
-- Insecure Design (2 types)
-- SSRF (1 type)
-
-## Performance Tips
-
-1. Adjust threads based on target: 25-50 for most applications
-2. Use crawl_max_pages to limit discovery scope
-3. Combine parameters to reduce mutation count
-4. Run against high-traffic endpoints last
-5. Monitor target resource usage during scans
-
-## Troubleshooting
-
-1. **No findings on known vulnerable app**: Check if target is reachable, try with -c flag
-2. **High false positives**: Adjust matcher conditions in templates
-3. **Slow scanning**: Reduce threads or crawl depth
-4. **TLS errors**: Set verify_ssl to false for testing (use with caution)
-5. **Missing headers**: Some payloads require custom headers in tests
-
----
-
-Last Updated: 2026-06-23
-Version: 2.0 with OWASP Top 10 2021 Coverage
+- Passive and safe checks are useful for presentations and low-risk demos.
+- Active checks are stronger because they mutate discovered parameters.
+- Always review evidence in JSON, HTML, PDF, or SARIF reports before claiming a
+  vulnerability is exploitable.

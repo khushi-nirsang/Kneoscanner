@@ -69,7 +69,7 @@ func (r *Results) SaveSARIF(outputFile string) error {
 		}{location}
 		results = append(results, current)
 	}
-	payload := map[string]any{"version": "2.1.0", "$schema": "https://json.schemastore.org/sarif-2.1.0.json", "runs": []any{map[string]any{"tool": map[string]any{"driver": map[string]any{"name": "KneoScanner", "informationUri": "https://github.com/khushi-nirsang/neoscanner", "rules": rules}}, "results": results}}}
+	payload := map[string]any{"version": "2.1.0", "$schema": "https://json.schemastore.org/sarif-2.1.0.json", "runs": []any{map[string]any{"tool": map[string]any{"driver": map[string]any{"name": "Kneoscanner", "informationUri": "https://github.com/khushi-nirsang/Kneoscanner", "rules": rules}}, "results": results}}}
 	data, err := json.MarshalIndent(payload, "", "  ")
 	if err != nil {
 		return err

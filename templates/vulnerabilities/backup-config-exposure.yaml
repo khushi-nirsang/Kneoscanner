@@ -1,0 +1,45 @@
+id: backup-config-exposure
+
+info:
+  name: Exposed Backup or Configuration File
+  author: khushi-nirsang
+  severity: high
+  description: Detects exposed backup, database dump, environment, and configuration files that often contain secrets or source data.
+  risk: safe
+  confidence: firm
+  tags:
+    - sensitive-files
+    - configuration
+    - cryptographic-failures
+    - a02:2021
+    - a05:2021
+  remediation: Remove backup/config files from web roots, rotate exposed secrets, and enforce deployment checks that block sensitive files.
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.env"
+      - "{{BaseURL}}/.env.local"
+      - "{{BaseURL}}/.env.backup"
+      - "{{BaseURL}}/config.php.bak"
+      - "{{BaseURL}}/config.php~"
+      - "{{BaseURL}}/backup.zip"
+      - "{{BaseURL}}/backup.sql"
+      - "{{BaseURL}}/db.sql"
+      - "{{BaseURL}}/database.sql"
+      - "{{BaseURL}}/settings.py"
+      - "{{BaseURL}}/wp-config.php.bak"
+    matchers:
+      - type: regex
+        part: body
+        regex:
+          - "(?m)^(APP_KEY|APP_SECRET|DATABASE_URL|DB_PASSWORD|SECRET_KEY|AWS_SECRET_ACCESS_KEY)="
+          - "(?i)DB_PASSWORD\\s*="
+          - "(?i)CREATE TABLE"
+          - "(?i)INSERT INTO"
+          - "(?i)define\\(['\"]DB_PASSWORD['\"]"
+          - "(?i)SECRET_KEY\\s*="
+      - type: status
+        status:
+          - 200
+    matchers-condition: and

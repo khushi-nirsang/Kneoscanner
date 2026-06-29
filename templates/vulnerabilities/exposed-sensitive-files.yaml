@@ -2,7 +2,7 @@ id: exposed-sensitive-files
 
 info:
   name: Exposed Sensitive File
-  author: neoscanner
+  author: khushi-nirsang
   severity: high
   description: Detects directly accessible repository metadata or environment configuration evidence.
   tags:
